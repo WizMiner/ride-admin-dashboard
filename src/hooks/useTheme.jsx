@@ -1,51 +1,53 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { themes, applyTheme, getThemeList } from '../common/themes';
+import { createContext, useContext, useState, useEffect } from "react";
+import { themes, applyTheme, getThemeList } from "../common/themes";
 
 const ThemeContext = createContext();
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [currentTheme, setCurrentTheme] = useState('default');
+  // currentTheme drives what components render (and what getPalette returns)
+  const [currentTheme, setCurrentTheme] = useState("default");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load theme from localStorage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('ride-admin-theme');
-    if (savedTheme && themes[savedTheme]) {
-      setCurrentTheme(savedTheme);
-      applyTheme(savedTheme);
-    } else {
-      applyTheme('default');
-    }
+    const savedTheme = localStorage.getItem("ride-admin-theme");
+    const themeToApply =
+      savedTheme && themes[savedTheme] ? savedTheme : "default";
+    setCurrentTheme(themeToApply);
+    applyTheme(themeToApply);
+    // console.debug("[ThemeProvider] mounted — applying theme:", themeToApply);
     setIsLoading(false);
   }, []);
 
-  // Apply theme and save to localStorage
+  // Persisted change: set current theme and save
   const changeTheme = (themeName) => {
-    if (themes[themeName]) {
-      setCurrentTheme(themeName);
-      applyTheme(themeName);
-      localStorage.setItem('ride-admin-theme', themeName);
-    }
+    if (!themes[themeName]) return;
+    // console.debug("[ThemeProvider] changeTheme ->", themeName);
+    setCurrentTheme(themeName);
+    applyTheme(themeName);
+    localStorage.setItem("ride-admin-theme", themeName);
   };
 
-  // Preview theme without saving
+  // Preview without saving: updates currentTheme so components show it,
+  // but DOES NOT write to localStorage (hover preview behavior)
   const previewTheme = (themeName) => {
-    if (themes[themeName]) {
-      applyTheme(themeName);
-    }
+    if (!themes[themeName]) return;
+    // console.debug("[ThemeProvider] previewTheme ->", themeName);
+    setCurrentTheme(themeName);
+    applyTheme(themeName);
   };
 
-  // Reset to saved theme
+  // Reset to saved theme (or default)
   const resetTheme = () => {
-    const savedTheme = localStorage.getItem('ride-admin-theme') || 'default';
+    const savedTheme = localStorage.getItem("ride-admin-theme") || "default";
+    // console.debug("[ThemeProvider] resetTheme ->", savedTheme);
     setCurrentTheme(savedTheme);
     applyTheme(savedTheme);
   };
@@ -56,12 +58,10 @@ export const ThemeProvider = ({ children }) => {
     previewTheme,
     resetTheme,
     themes: getThemeList(),
-    isLoading
+    isLoading,
   };
 
   return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 };

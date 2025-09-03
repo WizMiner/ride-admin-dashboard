@@ -1,145 +1,145 @@
-import React from 'react';
-import { 
-  Users, 
-  Car, 
-  MapPin, 
-  CreditCard, 
-  TrendingUp, 
+import React from "react";
+import {
+  Users,
+  Car,
+  MapPin,
+  CreditCard,
+  TrendingUp,
   TrendingDown,
-  Activity,
-  Clock
-} from 'lucide-react';
-import { useTheme } from '../hooks/useTheme.jsx';
-import { cn } from '../common/utils';
-
-// Theme color mapping
-const getThemeColors = (themeName) => {
-  const colorMap = {
-    default: { primary: 'blue-600', primaryHover: 'blue-700', primaryLight: 'blue-100' },
-    dark: { primary: 'blue-500', primaryHover: 'blue-600', primaryLight: 'blue-900' },
-    green: { primary: 'green-600', primaryHover: 'green-700', primaryLight: 'green-100' },
-    purple: { primary: 'purple-600', primaryHover: 'purple-700', primaryLight: 'purple-100' },
-    red: { primary: 'red-600', primaryHover: 'red-700', primaryLight: 'red-100' },
-    orange: { primary: 'orange-600', primaryHover: 'orange-700', primaryLight: 'orange-100' },
-    teal: { primary: 'teal-600', primaryHover: 'teal-700', primaryLight: 'teal-100' },
-    indigo: { primary: 'indigo-600', primaryHover: 'indigo-700', primaryLight: 'indigo-100' },
-    rose: { primary: 'rose-600', primaryHover: 'rose-700', primaryLight: 'rose-100' },
-    emerald: { primary: 'emerald-600', primaryHover: 'emerald-700', primaryLight: 'emerald-100' }
-  };
-  return colorMap[themeName] || colorMap.default;
-};
+} from "lucide-react";
+import { useTheme } from "../hooks/useTheme.jsx";
+import { getPalette } from "../common/themes";
+import { cn } from "../common/utils";
 
 const Dashboard = () => {
   const { currentTheme } = useTheme();
-  const colors = getThemeColors(currentTheme);
+  const palette = getPalette(currentTheme);
+
   const stats = [
     {
-      title: 'Total Users',
-      value: '12,543',
-      change: '+12.5%',
-      trend: 'up',
+      title: "Total Users",
+      value: "12,543",
+      change: "+12.5%",
+      trend: "up",
       icon: Users,
-      color: 'text-blue-600'
+      colorClass: "text-primary",
     },
     {
-      title: 'Active Drivers',
-      value: '1,234',
-      change: '+8.2%',
-      trend: 'up',
+      title: "Active Drivers",
+      value: "1,234",
+      change: "+8.2%",
+      trend: "up",
       icon: Car,
-      color: 'text-green-600'
+      colorClass: "text-primary",
     },
     {
-      title: 'Total Rides',
-      value: '45,678',
-      change: '+15.3%',
-      trend: 'up',
+      title: "Total Rides",
+      value: "45,678",
+      change: "+15.3%",
+      trend: "up",
       icon: MapPin,
-      color: 'text-purple-600'
+      colorClass: "text-primary",
     },
     {
-      title: 'Revenue',
-      value: '$125,430',
-      change: '+22.1%',
-      trend: 'up',
+      title: "Revenue",
+      value: "$125,430",
+      change: "+22.1%",
+      trend: "up",
       icon: CreditCard,
-      color: 'text-orange-600'
-    }
+      colorClass: "text-primary",
+    },
   ];
 
   const recentActivities = [
     {
       id: 1,
-      type: 'ride',
-      message: 'New ride completed from Downtown to Airport',
-      time: '2 minutes ago',
-      icon: MapPin
+      type: "ride",
+      message: "New ride completed from Downtown to Airport",
+      time: "2 minutes ago",
+      icon: MapPin,
     },
     {
       id: 2,
-      type: 'user',
-      message: 'New user registered: john.doe@email.com',
-      time: '5 minutes ago',
-      icon: Users
+      type: "user",
+      message: "New user registered: john.doe@email.com",
+      time: "5 minutes ago",
+      icon: Users,
     },
     {
       id: 3,
-      type: 'payment',
-      message: 'Payment processed: $25.50',
-      time: '8 minutes ago',
-      icon: CreditCard
+      type: "payment",
+      message: "Payment processed: $25.50",
+      time: "8 minutes ago",
+      icon: CreditCard,
     },
     {
       id: 4,
-      type: 'driver',
-      message: 'Driver status updated: Online',
-      time: '12 minutes ago',
-      icon: Car
-    }
+      type: "driver",
+      message: "Driver status updated: Online",
+      time: "12 minutes ago",
+      icon: Car,
+    },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className={cn("text-3xl font-bold", "text-theme")}>Dashboard</h1>
+        <p className={cn("mt-1", "text-muted-theme")}>
           Welcome back! Here's what's happening with your ride service today.
         </p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => {
+        {stats.map((stat, idx) => {
           const Icon = stat.icon;
-          const TrendIcon = stat.trend === 'up' ? TrendingUp : TrendingDown;
-          
+          const TrendIcon = stat.trend === "up" ? TrendingUp : TrendingDown;
           return (
-            <div key={index} className="card p-6">
+            <div
+              key={idx}
+              className={cn(
+                "rounded-lg p-6 shadow-sm",
+                "bg-card",
+                "border-theme"
+              )}
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">
+                  <p className={cn("text-sm font-medium", "text-muted-theme")}>
                     {stat.title}
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">
+                  <p className={cn("text-2xl font-bold mt-1", "text-theme")}>
                     {stat.value}
                   </p>
                 </div>
-                <div className={`p-3 rounded-lg bg-gray-100 ${stat.color}`}>
+                <div
+                  className={cn(
+                    "p-3 rounded-lg",
+                    "bg-primary-100",
+                    "text-primary"
+                  )}
+                >
                   <Icon size={24} />
                 </div>
               </div>
+
               <div className="flex items-center mt-4">
-                <TrendIcon 
-                  size={16} 
-                  className={stat.trend === 'up' ? 'text-green-600' : 'text-red-600'} 
+                <TrendIcon
+                  size={16}
+                  className={
+                    stat.trend === "up" ? "text-green-500" : "text-red-500"
+                  }
                 />
-                <span className={`text-sm ml-1 ${
-                  stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
-                }`}>
+                <span
+                  className={cn(
+                    "text-sm ml-1",
+                    stat.trend === "up" ? "text-green-600" : "text-red-600"
+                  )}
+                >
                   {stat.change}
                 </span>
-                <span className="text-sm text-gray-500 ml-1">
+                <span className={cn("text-sm ml-1", "text-muted-theme")}>
                   from last month
                 </span>
               </div>
@@ -150,31 +150,50 @@ const Dashboard = () => {
 
       {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Activity */}
         <div className="lg:col-span-2">
-          <div className="card p-6">
+          <div
+            className={cn(
+              "rounded-lg p-6 shadow-sm",
+              "bg-card",
+              "border-theme"
+            )}
+          >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className={cn("text-xl font-semibold", "text-theme")}>
                 Recent Activity
               </h2>
-              <button className="btn btn-ghost text-sm">
+              <button
+                className={cn("btn btn-ghost text-sm", "text-muted-theme")}
+              >
                 View All
               </button>
             </div>
-            
+
             <div className="space-y-4">
               {recentActivities.map((activity) => {
                 const Icon = activity.icon;
                 return (
-                  <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className={cn("p-2 rounded-lg", `bg-${colors.primaryLight}`, `text-${colors.primary}`)}>
+                  <div
+                    key={activity.id}
+                    className={cn(
+                      "flex items-start gap-3 p-3 rounded-lg transition-colors",
+                      "hover-theme"
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "p-2 rounded-lg",
+                        "bg-primary-100",
+                        "text-primary"
+                      )}
+                    >
                       <Icon size={16} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900">
+                      <p className={cn("text-sm", "text-theme")}>
                         {activity.message}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className={cn("text-xs mt-1", "text-muted-theme")}>
                         {activity.time}
                       </p>
                     </div>
@@ -185,52 +204,94 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Quick Stats */}
         <div className="space-y-6">
-          <div className="card p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <div
+            className={cn(
+              "rounded-lg p-6 shadow-sm",
+              "bg-card",
+              "border-theme"
+            )}
+          >
+            <h3 className={cn("text-lg font-semibold", "text-theme")}>
               System Status
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-3 mt-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">API Status</span>
+                <span className={cn("text-sm", "text-muted-theme")}>
+                  API Status
+                </span>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-green-600">Online</span>
+                  <div className="w-2 h-2 bg-green-500 rounded-full" />
+                  <span className={cn("text-sm", "text-green-600")}>
+                    Online
+                  </span>
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Database</span>
+                <span className={cn("text-sm", "text-muted-theme")}>
+                  Database
+                </span>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-green-600">Healthy</span>
+                  <div className="w-2 h-2 bg-green-500 rounded-full" />
+                  <span className={cn("text-sm", "text-green-600")}>
+                    Healthy
+                  </span>
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Payment Gateway</span>
+                <span className={cn("text-sm", "text-muted-theme")}>
+                  Payment Gateway
+                </span>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-green-600">Active</span>
+                  <div className="w-2 h-2 bg-green-500 rounded-full" />
+                  <span className={cn("text-sm", "text-green-600")}>
+                    Active
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="card p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <div
+            className={cn(
+              "rounded-lg p-6 shadow-sm",
+              "bg-card",
+              "border-theme"
+            )}
+          >
+            <h3 className={cn("text-lg font-semibold", "text-theme")}>
               Quick Actions
             </h3>
-            <div className="space-y-2">
-              <button className="btn btn-primary w-full justify-start">
+            <div className="space-y-2 mt-4">
+              <button
+                className={cn(
+                  "w-full justify-start p-2 rounded-md",
+                  palette.btnPrimary
+                )}
+              >
                 <Users size={16} className="mr-2" />
                 Add New User
               </button>
-              <button className="btn btn-outline w-full justify-start">
+              <button
+                className={cn(
+                  "w-full justify-start p-2 rounded-md",
+                  "border-theme",
+                  "bg-card",
+                  "text-theme"
+                )}
+              >
                 <Car size={16} className="mr-2" />
                 Register Driver
               </button>
-              <button className="btn btn-outline w-full justify-start">
-                <Activity size={16} className="mr-2" />
+              <button
+                className={cn(
+                  "w-full justify-start p-2 rounded-md",
+                  "border-theme",
+                  "bg-card",
+                  "text-theme"
+                )}
+              >
+                <TrendingUp size={16} className="mr-2" />
                 View Reports
               </button>
             </div>

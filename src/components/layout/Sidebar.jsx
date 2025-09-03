@@ -17,68 +17,13 @@ import {
 } from "lucide-react";
 import { cn } from "../../common/utils";
 import { useTheme } from "../../hooks/useTheme.jsx";
-
-// Theme color mapping
-const getThemeColors = (themeName) => {
-  const colorMap = {
-    default: {
-      primary: "blue-600",
-      primaryHover: "blue-700",
-      primaryLight: "blue-100",
-    },
-    dark: {
-      primary: "blue-500",
-      primaryHover: "blue-600",
-      primaryLight: "blue-900",
-    },
-    green: {
-      primary: "green-600",
-      primaryHover: "green-700",
-      primaryLight: "green-100",
-    },
-    purple: {
-      primary: "purple-600",
-      primaryHover: "purple-700",
-      primaryLight: "purple-100",
-    },
-    red: {
-      primary: "red-600",
-      primaryHover: "red-700",
-      primaryLight: "red-100",
-    },
-    orange: {
-      primary: "orange-600",
-      primaryHover: "orange-700",
-      primaryLight: "orange-100",
-    },
-    teal: {
-      primary: "teal-600",
-      primaryHover: "teal-700",
-      primaryLight: "teal-100",
-    },
-    indigo: {
-      primary: "indigo-600",
-      primaryHover: "indigo-700",
-      primaryLight: "indigo-100",
-    },
-    rose: {
-      primary: "rose-600",
-      primaryHover: "rose-700",
-      primaryLight: "rose-100",
-    },
-    emerald: {
-      primary: "emerald-600",
-      primaryHover: "emerald-700",
-      primaryLight: "emerald-100",
-    },
-  };
-  return colorMap[themeName] || colorMap.default;
-};
+import { getPalette } from "../../common/themes";
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
   const { currentTheme } = useTheme();
-  const colors = getThemeColors(currentTheme);
+  const palette = getPalette(currentTheme);
+
   const [expandedGroups, setExpandedGroups] = React.useState({
     dashboard: true,
     management: true,
@@ -87,10 +32,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   });
 
   const toggleGroup = (groupKey) => {
-    setExpandedGroups((prev) => ({
-      ...prev,
-      [groupKey]: !prev[groupKey],
-    }));
+    setExpandedGroups((prev) => ({ ...prev, [groupKey]: !prev[groupKey] }));
   };
 
   const menuItems = [
@@ -133,46 +75,61 @@ const Sidebar = ({ isOpen, onClose }) => {
   ];
 
   const isActive = (path) => {
-    if (path === "/") {
-      return location.pathname === "/";
-    }
+    if (path === "/") return location.pathname === "/";
     return location.pathname.startsWith(path);
   };
 
   return (
     <>
-      {/* Overlay for mobile */}
+      {/* Mobile overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={onClose}
+          aria-hidden="true"
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-16 left-0 bottom-0 w-64 bg-white border-r border-gray-200 z-40 transform transition-transform duration-300 ease-in-out",
+          "fixed top-16 left-0 bottom-0 w-64 z-40 transform transition-transform duration-300 ease-in-out",
+          // palette-driven background/border classes
+          palette.sidebarBg,
+          "border-r",
+          palette.sidebarBorder,
           isOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0"
         )}
       >
         <div className="flex flex-col h-full lg:h-screen">
-          {/* Sidebar Header */}
-          <div className="p-4 border-b border-gray-200">
-            <h2 className="font-semibold text-sm text-gray-500 uppercase tracking-wider">
+          {/* Header */}
+          <div className={cn("p-4", "border-b", palette.sidebarBorder)}>
+            <h2
+              className={cn(
+                "font-semibold text-sm uppercase tracking-wider",
+                palette.sidebarMuted
+              )}
+            >
               Navigation
             </h2>
           </div>
 
-          {/* Menu Items */}
-          <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+          {/* Menu */}
+          <nav
+            className={cn(
+              "flex-1 overflow-y-auto p-4 space-y-2",
+              palette.sidebarBg
+            )}
+          >
             {menuItems.map((group) => (
               <div key={group.group} className="space-y-1">
-                {/* Group Header */}
                 <button
                   onClick={() => toggleGroup(group.group)}
-                  className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+                  className={cn(
+                    "flex items-center justify-between w-full px-3 py-2 text-sm font-medium transition-colors",
+                    palette.sidebarText
+                  )}
+                  type="button"
                 >
                   <span>{group.title}</span>
                   {expandedGroups[group.group] ? (
@@ -182,23 +139,26 @@ const Sidebar = ({ isOpen, onClose }) => {
                   )}
                 </button>
 
-                {/* Group Items */}
                 {expandedGroups[group.group] && (
                   <div className="space-y-1 ml-2">
                     {group.items.map((item) => {
                       const Icon = item.icon;
+                      const active = isActive(item.path);
                       return (
                         <Link
                           key={item.path}
                           to={item.path}
                           onClick={onClose}
                           className={cn(
-                            "sidebar-item",
-                            isActive(item.path) && "active"
+                            "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors",
+                            palette.sidebarText,
+                            palette.sidebarHoverBg,
+                            active && palette.sidebarActiveBg,
+                            active && palette.sidebarActiveText
                           )}
                         >
                           <Icon size={18} />
-                          <span>{item.label}</span>
+                          <span className="truncate">{item.label}</span>
                         </Link>
                       );
                     })}
@@ -208,20 +168,30 @@ const Sidebar = ({ isOpen, onClose }) => {
             ))}
           </nav>
 
-          {/* Sidebar Footer */}
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center gap-3 p-2 rounded-lg bg-gray-50">
+          {/* Footer / profile */}
+          <div className={cn("p-4", "border-t", palette.sidebarBorder)}>
+            <div
+              className={cn(
+                "flex items-center gap-3 p-2 rounded-lg",
+                "bg-opacity-40",
+                palette.sidebarBg
+              )}
+            >
               <div
                 className={cn(
                   "w-8 h-8 rounded-full flex items-center justify-center",
-                  `bg-${colors.primary}`
+                  palette.avatarBg
                 )}
               >
                 <span className="text-white font-semibold text-sm">A</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">Admin User</p>
-                <p className="text-xs text-gray-500 truncate">admin@ride.com</p>
+                <p className={cn("text-sm font-medium truncate", palette.text)}>
+                  Admin User
+                </p>
+                <p className={cn("text-xs truncate", palette.sidebarMuted)}>
+                  admin@ride.com
+                </p>
               </div>
             </div>
           </div>
