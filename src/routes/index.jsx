@@ -3,184 +3,122 @@ import Layout from "../components/layout/Layout.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
 import Users from "../pages/Users.jsx";
 import Drivers from "../pages/Drivers.jsx";
-
-// Placeholder components for other routes
-const Rides = () => (
-  <div className="space-y-6">
-    <h1 className="text-3xl font-bold text-foreground">Rides</h1>
-    <p className="text-muted-foreground">
-      Manage and monitor ride requests and completions.
-    </p>
-    <div className="card p-6">
-      <p className="text-center text-muted-foreground">
-        Rides management page coming soon...
-      </p>
-    </div>
-  </div>
-);
-
-const Payments = () => (
-  <div className="space-y-6">
-    <h1 className="text-3xl font-bold text-foreground">Payments</h1>
-    <p className="text-muted-foreground">
-      Track and manage payment transactions.
-    </p>
-    <div className="card p-6">
-      <p className="text-center text-muted-foreground">
-        Payments management page coming soon...
-      </p>
-    </div>
-  </div>
-);
-
-const Analytics = () => (
-  <div className="space-y-6">
-    <h1 className="text-3xl font-bold text-foreground">Analytics</h1>
-    <p className="text-muted-foreground">
-      View detailed analytics and insights.
-    </p>
-    <div className="card p-6">
-      <p className="text-center text-muted-foreground">
-        Analytics page coming soon...
-      </p>
-    </div>
-  </div>
-);
-
-const Reports = () => (
-  <div className="space-y-6">
-    <h1 className="text-3xl font-bold text-foreground">Reports</h1>
-    <p className="text-muted-foreground">Generate and view various reports.</p>
-    <div className="card p-6">
-      <p className="text-center text-muted-foreground">
-        Reports page coming soon...
-      </p>
-    </div>
-  </div>
-);
-
-const Insights = () => (
-  <div className="space-y-6">
-    <h1 className="text-3xl font-bold text-foreground">Insights</h1>
-    <p className="text-muted-foreground">
-      Business insights and recommendations.
-    </p>
-    <div className="card p-6">
-      <p className="text-center text-muted-foreground">
-        Insights page coming soon...
-      </p>
-    </div>
-  </div>
-);
-
-const Notifications = () => (
-  <div className="space-y-6">
-    <h1 className="text-3xl font-bold text-foreground">Notifications</h1>
-    <p className="text-muted-foreground">
-      Manage system notifications and alerts.
-    </p>
-    <div className="card p-6">
-      <p className="text-center text-muted-foreground">
-        Notifications page coming soon...
-      </p>
-    </div>
-  </div>
-);
-
-const Settings = () => (
-  <div className="space-y-6">
-    <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-    <p className="text-muted-foreground">
-      Configure system settings and preferences.
-    </p>
-    <div className="card p-6">
-      <p className="text-center text-muted-foreground">
-        Settings page coming soon...
-      </p>
-    </div>
-  </div>
-);
-
-const Security = () => (
-  <div className="space-y-6">
-    <h1 className="text-3xl font-bold text-foreground">Security</h1>
-    <p className="text-muted-foreground">
-      Manage security settings and access controls.
-    </p>
-    <div className="card p-6">
-      <p className="text-center text-muted-foreground">
-        Security page coming soon...
-      </p>
-    </div>
-  </div>
-);
-
-const Help = () => (
-  <div className="space-y-6">
-    <h1 className="text-3xl font-bold text-foreground">Help & Support</h1>
-    <p className="text-muted-foreground">
-      Get help and support for the admin dashboard.
-    </p>
-    <div className="card p-6">
-      <p className="text-center text-muted-foreground">
-        Help & Support page coming soon...
-      </p>
-    </div>
-  </div>
-);
+import Login from "../pages/Login.jsx";
+import ProtectedRoute from "./ProtectedRoute.jsx";
+import Rides from "../pages/Rides.jsx";
+import Payments from "../pages/Payments.jsx";
+import Analytics from "../pages/Analytics.jsx";
+import Reports from "../pages/Reports.jsx";
+import Insights from "../pages/Insights.jsx";
+import Notifications from "../pages/Notifications.jsx";
+import Settings from "../pages/Settings.jsx";
+import Security from "../pages/Security.jsx";
+import Help from "../pages/Help.jsx";
 
 export const router = createBrowserRouter([
+  {
+    path: "/login",
+    element: <Login />,
+  },
   {
     path: "/",
     element: <Layout />,
     children: [
       {
         index: true,
-        element: <Dashboard />,
+        element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "analytics",
-        element: <Analytics />,
+        element: (
+          <ProtectedRoute>
+            <Analytics />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "users",
-        element: <Users />,
+        element: (
+          <ProtectedRoute>
+            <Users />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "drivers",
-        element: <Drivers />,
+        element: (
+          <ProtectedRoute>
+            <Drivers />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "rides",
-        element: <Rides />,
+        element: (
+          <ProtectedRoute>
+            <Rides />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "payments",
-        element: <Payments />,
+        element: (
+          <ProtectedRoute>
+            <Payments />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "reports",
-        element: <Reports />,
+        element: (
+          <ProtectedRoute>
+            <Reports />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "insights",
-        element: <Insights />,
+        element: (
+          <ProtectedRoute>
+            <Insights />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "notifications",
-        element: <Notifications />,
+        element: (
+          <ProtectedRoute>
+            <Notifications />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "settings",
-        element: <Settings />,
+        element: (
+          <ProtectedRoute requireSuperAdmin>
+            <Settings />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "security",
-        element: <Security />,
+        element: (
+          <ProtectedRoute requireSuperAdmin>
+            <Security />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "help",
-        element: <Help />,
+        element: (
+          <ProtectedRoute>
+            <Help />
+          </ProtectedRoute>
+        ),
       },
     ],
   },

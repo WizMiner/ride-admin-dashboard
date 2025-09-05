@@ -1,21 +1,17 @@
-// src/components/layout/Navbar.jsx
-import React, { useState, useEffect } from "react";
-import { Search, Palette, Settings, Menu, X, Car } from "lucide-react";
+import React, { useState, useEffect, useContext } from "react";
+import { Search, Palette, Settings, Menu, X, Car, LogOut } from "lucide-react";
 import { useTheme } from "../../hooks/useTheme.jsx";
 import { getPalette } from "../../common/themes";
 import { cn } from "../../common/utils";
+import { AuthContext } from "../../contexts/AuthContextDefinition";
 
 const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showThemeSelector, setShowThemeSelector] = useState(false);
-
   const { currentTheme, themes, changeTheme, previewTheme, resetTheme } =
     useTheme();
+  const { auth, logout } = useContext(AuthContext);
   const palette = getPalette(currentTheme);
-
-  useEffect(() => {
-    // console.debug("[Navbar] currentTheme:", currentTheme, "palette:", palette);
-  }, [currentTheme, palette]);
 
   const handleThemeSelect = (themeKey) => {
     changeTheme(themeKey);
@@ -36,9 +32,7 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
       )}
     >
       <div className="flex items-center justify-between h-16 px-4">
-        {/* Left: menu toggle (mobile-only) + logo */}
         <div className="flex items-center gap-4">
-          {/* MOBILE-ONLY hamburger: explicit block on small, hidden at lg+ */}
           <button
             onClick={onMenuToggle}
             className={cn(
@@ -50,7 +44,6 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
           >
             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-
           <div className="flex items-center gap-2">
             <div
               className={cn(
@@ -70,8 +63,6 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
             </span>
           </div>
         </div>
-
-        {/* Center: search */}
         <div className="flex-1 max-w-md mx-4">
           <div className="relative">
             <Search
@@ -96,8 +87,6 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
             />
           </div>
         </div>
-
-        {/* Right: theme selector & settings */}
         <div className="flex items-center gap-2">
           <div className="relative">
             <button
@@ -107,7 +96,6 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
             >
               <Palette size={20} />
             </button>
-
             {showThemeSelector && (
               <div
                 className={cn(
@@ -118,7 +106,6 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
                 )}
               >
                 <h3 className="font-semibold mb-3">Choose Theme</h3>
-
                 <div className="grid grid-cols-2 gap-2">
                   {themes.map((t) => {
                     const themePalette = getPalette(t.key);
@@ -151,7 +138,6 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
                     );
                   })}
                 </div>
-
                 <div className="mt-3 pt-3 border-t border-theme">
                   <p className="text-xs text-muted-theme">
                     Hover to preview, click to apply
@@ -160,13 +146,24 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
               </div>
             )}
           </div>
-
-          <button
-            className={cn("btn btn-ghost p-2", "text-muted-theme")}
-            aria-label="Settings"
-          >
-            <Settings size={20} />
-          </button>
+          {auth.isAuthenticated && (
+            <button
+              onClick={logout}
+              className={cn("btn btn-ghost p-2", "text-muted-theme")}
+              aria-label="Logout"
+            >
+              <LogOut size={20} />
+            </button>
+          )}
+          {!auth.isAuthenticated && (
+            <button
+              onClick={() => navigate("/login")}
+              className={cn("btn btn-ghost p-2", "text-muted-theme")}
+              aria-label="Login"
+            >
+              <Settings size={20} />
+            </button>
+          )}
         </div>
       </div>
     </nav>

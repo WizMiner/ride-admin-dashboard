@@ -14,12 +14,16 @@ import {
   HelpCircle,
   ChevronDown,
   ChevronRight,
+  LogOut,
 } from "lucide-react";
 import { cn } from "../../common/utils";
 import { useTheme } from "../../hooks/useTheme.jsx";
 import { getPalette } from "../../common/themes";
+import { AuthContext } from "../../contexts/AuthContextDefinition";
+import { useContext } from "react";
 
 const Sidebar = ({ isOpen, onClose }) => {
+  const { auth, logout } = useContext(AuthContext);
   const location = useLocation();
   const { currentTheme } = useTheme();
   const palette = getPalette(currentTheme);
@@ -67,8 +71,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       title: "System",
       items: [
         { path: "/notifications", label: "Notifications", icon: Bell },
-        { path: "/settings", label: "Settings", icon: Settings },
-        { path: "/security", label: "Security", icon: Shield },
+        ...(auth.isSuperAdmin
+          ? [
+              { path: "/settings", label: "Settings", icon: Settings },
+              { path: "/security", label: "Security", icon: Shield },
+            ]
+          : []),
         { path: "/help", label: "Help & Support", icon: HelpCircle },
       ],
     },
@@ -81,7 +89,6 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <>
-      {/* Mobile overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -89,11 +96,9 @@ const Sidebar = ({ isOpen, onClose }) => {
           aria-hidden="true"
         />
       )}
-
       <aside
         className={cn(
           "fixed top-16 left-0 bottom-0 w-64 z-40 transform transition-transform duration-300 ease-in-out",
-          // palette-driven background/border classes
           palette.sidebarBg,
           "border-r",
           palette.sidebarBorder,
@@ -102,7 +107,6 @@ const Sidebar = ({ isOpen, onClose }) => {
         )}
       >
         <div className="flex flex-col h-full lg:h-screen">
-          {/* Header */}
           <div className={cn("p-4", "border-b", palette.sidebarBorder)}>
             <h2
               className={cn(
@@ -113,8 +117,6 @@ const Sidebar = ({ isOpen, onClose }) => {
               Navigation
             </h2>
           </div>
-
-          {/* Menu */}
           <nav
             className={cn(
               "flex-1 overflow-y-auto p-4 space-y-2",
@@ -138,7 +140,6 @@ const Sidebar = ({ isOpen, onClose }) => {
                     <ChevronRight size={16} />
                   )}
                 </button>
-
                 {expandedGroups[group.group] && (
                   <div className="space-y-1 ml-2">
                     {group.items.map((item) => {
@@ -167,8 +168,6 @@ const Sidebar = ({ isOpen, onClose }) => {
               </div>
             ))}
           </nav>
-
-          {/* Footer / profile */}
           <div className={cn("p-4", "border-t", palette.sidebarBorder)}>
             <div
               className={cn(
@@ -183,16 +182,27 @@ const Sidebar = ({ isOpen, onClose }) => {
                   palette.avatarBg
                 )}
               >
-                <span className="text-white font-semibold text-sm">A</span>
+                <span className="text-white font-semibold text-sm">
+                  {auth.admin?.fullName?.[0] || "A"}
+                </span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className={cn("text-sm font-medium truncate", palette.text)}>
-                  Admin User
+                  {auth.admin?.fullName || "Admin User"}
                 </p>
                 <p className={cn("text-xs truncate", palette.sidebarMuted)}>
-                  admin@ride.com
+                  {auth.admin?.email ||
+                    auth.admin?.username ||
+                    "admin@ride.com"}
                 </p>
               </div>
+              <button
+                onClick={logout}
+                className={cn("p-2", "text-muted-theme", "hover-theme")}
+                aria-label="Logout"
+              >
+                <LogOut size={18} />
+              </button>
             </div>
           </div>
         </div>
