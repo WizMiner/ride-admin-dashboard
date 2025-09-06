@@ -5,7 +5,9 @@ const Reports = () => (
     <h1 className="text-3xl font-bold text-foreground">Reports</h1>
     <p className="text-muted-foreground">Generate and view various reports.</p>
     <div className={cn('card p-6', 'bg-card')}>
-      <p className="text-center text-muted-foreground">Reports page coming soon...</p>
+      <p className="text-center text-muted-foreground">
+        Reports page coming soon...
+      </p>
     </div>
   </div>
 );

@@ -1,17 +1,19 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Search, Palette, Settings, Menu, X, Car, LogOut } from "lucide-react";
-import { useTheme } from "../../hooks/useTheme.jsx";
-import { getPalette } from "../../common/themes";
-import { cn } from "../../common/utils";
-import { AuthContext } from "../../contexts/AuthContextDefinition";
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Palette, Settings, Menu, X, Car, LogOut } from 'lucide-react';
+import { useTheme } from '../../hooks/useTheme.jsx';
+import { getPalette } from '../../common/themes';
+import { cn } from '../../common/utils';
+import { AuthContext } from '../../contexts/AuthContextDefinition';
 
 const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [showThemeSelector, setShowThemeSelector] = useState(false);
   const { currentTheme, themes, changeTheme, previewTheme, resetTheme } =
     useTheme();
   const { auth, logout } = useContext(AuthContext);
   const palette = getPalette(currentTheme);
+  const navigate = useNavigate();
 
   const handleThemeSelect = (themeKey) => {
     changeTheme(themeKey);
@@ -25,10 +27,10 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 border-b",
-        "border-theme",
-        "bg-theme",
-        "text-theme"
+        'fixed top-0 left-0 right-0 z-50 border-b',
+        'border-theme',
+        'bg-theme',
+        'text-theme'
       )}
     >
       <div className="flex items-center justify-between h-16 px-4">
@@ -36,10 +38,10 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
           <button
             onClick={onMenuToggle}
             className={cn(
-              "block lg:hidden btn btn-ghost p-2",
-              "text-muted-theme"
+              'block lg:hidden btn btn-ghost p-2',
+              'text-muted-theme'
             )}
-            aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+            aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
             aria-expanded={isSidebarOpen}
           >
             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
@@ -47,7 +49,7 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
           <div className="flex items-center gap-2">
             <div
               className={cn(
-                "p-1 rounded-full flex items-center justify-center",
+                'p-1 rounded-full flex items-center justify-center',
                 palette.avatarBg
               )}
             >
@@ -55,8 +57,8 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
             </div>
             <span
               className={cn(
-                "font-semibold text-lg hidden sm:block",
-                "text-theme"
+                'font-semibold text-lg hidden sm:block',
+                'text-theme'
               )}
             >
               Ride Admin
@@ -67,8 +69,8 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
           <div className="relative">
             <Search
               className={cn(
-                "absolute left-3 top-1/2 transform -translate-y-1/2",
-                "text-muted-theme"
+                'absolute left-3 top-1/2 transform -translate-y-1/2',
+                'text-muted-theme'
               )}
               size={16}
             />
@@ -78,11 +80,11 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className={cn(
-                "input pl-10 w-full",
-                "bg-card",
-                "text-theme",
-                "border-theme",
-                "placeholder:text-muted-theme"
+                'input pl-10 w-full',
+                'bg-card',
+                'text-theme',
+                'border-theme',
+                'placeholder:text-muted-theme'
               )}
             />
           </div>
@@ -91,7 +93,7 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
           <div className="relative">
             <button
               onClick={() => setShowThemeSelector((s) => !s)}
-              className={cn("btn btn-ghost p-2", "text-muted-theme")}
+              className={cn('btn btn-ghost p-2', 'text-muted-theme')}
               aria-label="Change theme"
             >
               <Palette size={20} />
@@ -99,10 +101,10 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
             {showThemeSelector && (
               <div
                 className={cn(
-                  "absolute right-0 top-full mt-2 w-64 rounded-lg shadow-lg p-4",
-                  "bg-card",
-                  "border-theme",
-                  "text-theme"
+                  'absolute right-0 top-full mt-2 w-64 rounded-lg shadow-lg p-4',
+                  'bg-card',
+                  'border-theme',
+                  'text-theme'
                 )}
               >
                 <h3 className="font-semibold mb-3">Choose Theme</h3>
@@ -118,10 +120,10 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
                         onMouseLeave={resetTheme}
                         type="button"
                         className={cn(
-                          "flex items-center gap-2 p-2 rounded-md text-sm transition-colors",
+                          'flex items-center gap-2 p-2 rounded-md text-sm transition-colors',
                           isActive
                             ? themePalette.btnPrimary
-                            : "hover:opacity-95"
+                            : 'hover:opacity-95'
                         )}
                       >
                         <div className="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center">
@@ -129,7 +131,7 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
                             className="w-full h-full rounded-full"
                             style={{
                               background:
-                                "linear-gradient(45deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02))",
+                                'linear-gradient(45deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02))',
                             }}
                           />
                         </div>
@@ -149,7 +151,7 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
           {auth.isAuthenticated && (
             <button
               onClick={logout}
-              className={cn("btn btn-ghost p-2", "text-muted-theme")}
+              className={cn('btn btn-ghost p-2', 'text-muted-theme')}
               aria-label="Logout"
             >
               <LogOut size={20} />
@@ -157,8 +159,8 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
           )}
           {!auth.isAuthenticated && (
             <button
-              onClick={() => navigate("/login")}
-              className={cn("btn btn-ghost p-2", "text-muted-theme")}
+              onClick={() => navigate('/login')}
+              className={cn('btn btn-ghost p-2', 'text-muted-theme')}
               aria-label="Login"
             >
               <Settings size={20} />

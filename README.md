@@ -133,6 +133,7 @@ The dashboard is fully responsive with:
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
+- `npx eslint . --ext .js,.jsx --fix` - Run Eslint To check for code style issues and automatically fix them
 
 ## 📄 License
 

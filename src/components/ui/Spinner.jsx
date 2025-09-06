@@ -1,4 +1,4 @@
-const Spinner = ({ size = 12, color = "blue-500", text = "Loading..." }) => {
+const Spinner = ({ size = 12, color = 'blue-500', text = 'Loading...' }) => {
   return (
     <div className="flex flex-col items-center justify-center h-screen">
       <div

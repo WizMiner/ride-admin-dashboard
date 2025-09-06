@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
   Home,
   Users,
@@ -15,12 +15,12 @@ import {
   ChevronDown,
   ChevronRight,
   LogOut,
-} from "lucide-react";
-import { cn } from "../../common/utils";
-import { useTheme } from "../../hooks/useTheme.jsx";
-import { getPalette } from "../../common/themes";
-import { AuthContext } from "../../contexts/AuthContextDefinition";
-import { useContext } from "react";
+} from 'lucide-react';
+import { cn } from '../../common/utils';
+import { useTheme } from '../../hooks/useTheme.jsx';
+import { getPalette } from '../../common/themes';
+import { AuthContext } from '../../contexts/AuthContextDefinition';
+import { useContext } from 'react';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const { auth, logout } = useContext(AuthContext);
@@ -41,49 +41,49 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   const menuItems = [
     {
-      group: "dashboard",
-      title: "Dashboard",
+      group: 'dashboard',
+      title: 'Dashboard',
       items: [
-        { path: "/", label: "Overview", icon: Home },
-        { path: "/analytics", label: "Analytics", icon: BarChart3 },
+        { path: '/', label: 'Overview', icon: Home },
+        { path: '/analytics', label: 'Analytics', icon: BarChart3 },
       ],
     },
     {
-      group: "management",
-      title: "Management",
+      group: 'management',
+      title: 'Management',
       items: [
-        { path: "/users", label: "Users", icon: Users },
-        { path: "/drivers", label: "Drivers", icon: Car },
-        { path: "/rides", label: "Rides", icon: MapPin },
-        { path: "/payments", label: "Payments", icon: CreditCard },
+        { path: '/users', label: 'Users', icon: Users },
+        { path: '/drivers', label: 'Drivers', icon: Car },
+        { path: '/rides', label: 'Rides', icon: MapPin },
+        { path: '/payments', label: 'Payments', icon: CreditCard },
       ],
     },
     {
-      group: "analytics",
-      title: "Analytics",
+      group: 'analytics',
+      title: 'Analytics',
       items: [
-        { path: "/reports", label: "Reports", icon: FileText },
-        { path: "/insights", label: "Insights", icon: BarChart3 },
+        { path: '/reports', label: 'Reports', icon: FileText },
+        { path: '/insights', label: 'Insights', icon: BarChart3 },
       ],
     },
     {
-      group: "system",
-      title: "System",
+      group: 'system',
+      title: 'System',
       items: [
-        { path: "/notifications", label: "Notifications", icon: Bell },
+        { path: '/notifications', label: 'Notifications', icon: Bell },
         ...(auth.isSuperAdmin
           ? [
-              { path: "/settings", label: "Settings", icon: Settings },
-              { path: "/security", label: "Security", icon: Shield },
+              { path: '/settings', label: 'Settings', icon: Settings },
+              { path: '/security', label: 'Security', icon: Shield },
             ]
           : []),
-        { path: "/help", label: "Help & Support", icon: HelpCircle },
+        { path: '/help', label: 'Help & Support', icon: HelpCircle },
       ],
     },
   ];
 
   const isActive = (path) => {
-    if (path === "/") return location.pathname === "/";
+    if (path === '/') return location.pathname === '/';
     return location.pathname.startsWith(path);
   };
 
@@ -98,19 +98,19 @@ const Sidebar = ({ isOpen, onClose }) => {
       )}
       <aside
         className={cn(
-          "fixed top-16 left-0 bottom-0 w-64 z-40 transform transition-transform duration-300 ease-in-out",
+          'fixed top-16 left-0 bottom-0 w-64 z-40 transform transition-transform duration-300 ease-in-out',
           palette.sidebarBg,
-          "border-r",
+          'border-r',
           palette.sidebarBorder,
-          isOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0"
+          isOpen ? 'translate-x-0' : '-translate-x-full',
+          'lg:translate-x-0'
         )}
       >
         <div className="flex flex-col h-full lg:h-screen">
-          <div className={cn("p-4", "border-b", palette.sidebarBorder)}>
+          <div className={cn('p-4', 'border-b', palette.sidebarBorder)}>
             <h2
               className={cn(
-                "font-semibold text-sm uppercase tracking-wider",
+                'font-semibold text-sm uppercase tracking-wider',
                 palette.sidebarMuted
               )}
             >
@@ -119,7 +119,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           </div>
           <nav
             className={cn(
-              "flex-1 overflow-y-auto p-4 space-y-2",
+              'flex-1 overflow-y-auto p-4 space-y-2',
               palette.sidebarBg
             )}
           >
@@ -128,7 +128,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                 <button
                   onClick={() => toggleGroup(group.group)}
                   className={cn(
-                    "flex items-center justify-between w-full px-3 py-2 text-sm font-medium transition-colors",
+                    'flex items-center justify-between w-full px-3 py-2 text-sm font-medium transition-colors',
                     palette.sidebarText
                   )}
                   type="button"
@@ -151,7 +151,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                           to={item.path}
                           onClick={onClose}
                           className={cn(
-                            "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors",
+                            'flex items-center gap-3 rounded-lg px-3 py-2 transition-colors',
                             palette.sidebarText,
                             palette.sidebarHoverBg,
                             active && palette.sidebarActiveBg,
@@ -168,37 +168,37 @@ const Sidebar = ({ isOpen, onClose }) => {
               </div>
             ))}
           </nav>
-          <div className={cn("p-4", "border-t", palette.sidebarBorder)}>
+          <div className={cn('p-4', 'border-t', palette.sidebarBorder)}>
             <div
               className={cn(
-                "flex items-center gap-3 p-2 rounded-lg",
-                "bg-opacity-40",
+                'flex items-center gap-3 p-2 rounded-lg',
+                'bg-opacity-40',
                 palette.sidebarBg
               )}
             >
               <div
                 className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center",
+                  'w-8 h-8 rounded-full flex items-center justify-center',
                   palette.avatarBg
                 )}
               >
                 <span className="text-white font-semibold text-sm">
-                  {auth.admin?.fullName?.[0] || "A"}
+                  {auth.admin?.fullName?.[0] || 'A'}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className={cn("text-sm font-medium truncate", palette.text)}>
-                  {auth.admin?.fullName || "Admin User"}
+                <p className={cn('text-sm font-medium truncate', palette.text)}>
+                  {auth.admin?.fullName || 'Admin User'}
                 </p>
-                <p className={cn("text-xs truncate", palette.sidebarMuted)}>
+                <p className={cn('text-xs truncate', palette.sidebarMuted)}>
                   {auth.admin?.email ||
                     auth.admin?.username ||
-                    "admin@ride.com"}
+                    'admin@ride.com'}
                 </p>
               </div>
               <button
                 onClick={logout}
-                className={cn("p-2", "text-muted-theme", "hover-theme")}
+                className={cn('p-2', 'text-muted-theme', 'hover-theme')}
                 aria-label="Logout"
               >
                 <LogOut size={18} />

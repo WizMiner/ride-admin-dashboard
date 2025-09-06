@@ -1,27 +1,27 @@
-import { createBrowserRouter } from "react-router-dom";
-import Layout from "../components/layout/Layout.jsx";
-import Dashboard from "../pages/Dashboard.jsx";
-import Users from "../pages/Users.jsx";
-import Drivers from "../pages/Drivers.jsx";
-import Login from "../pages/Login.jsx";
-import ProtectedRoute from "./ProtectedRoute.jsx";
-import Rides from "../pages/Rides.jsx";
-import Payments from "../pages/Payments.jsx";
-import Analytics from "../pages/Analytics.jsx";
-import Reports from "../pages/Reports.jsx";
-import Insights from "../pages/Insights.jsx";
-import Notifications from "../pages/Notifications.jsx";
-import Settings from "../pages/Settings.jsx";
-import Security from "../pages/Security.jsx";
-import Help from "../pages/Help.jsx";
+import { createBrowserRouter } from 'react-router-dom';
+import Layout from '../components/layout/Layout.jsx';
+import Dashboard from '../pages/Dashboard.jsx';
+import Users from '../pages/Users.jsx';
+import Drivers from '../pages/Drivers.jsx';
+import Login from '../pages/Login.jsx';
+import ProtectedRoute from './ProtectedRoute.jsx';
+import Rides from '../pages/Rides.jsx';
+import Payments from '../pages/Payments.jsx';
+import Analytics from '../pages/Analytics.jsx';
+import Reports from '../pages/Reports.jsx';
+import Insights from '../pages/Insights.jsx';
+import Notifications from '../pages/Notifications.jsx';
+import Settings from '../pages/Settings.jsx';
+import Security from '../pages/Security.jsx';
+import Help from '../pages/Help.jsx';
 
 export const router = createBrowserRouter([
   {
-    path: "/login",
+    path: '/login',
     element: <Login />,
   },
   {
-    path: "/",
+    path: '/',
     element: <Layout />,
     children: [
       {
@@ -33,7 +33,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "analytics",
+        path: 'analytics',
         element: (
           <ProtectedRoute>
             <Analytics />
@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "users",
+        path: 'users',
         element: (
           <ProtectedRoute>
             <Users />
@@ -49,7 +49,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "drivers",
+        path: 'drivers',
         element: (
           <ProtectedRoute>
             <Drivers />
@@ -57,7 +57,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "rides",
+        path: 'rides',
         element: (
           <ProtectedRoute>
             <Rides />
@@ -65,7 +65,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "payments",
+        path: 'payments',
         element: (
           <ProtectedRoute>
             <Payments />
@@ -73,7 +73,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "reports",
+        path: 'reports',
         element: (
           <ProtectedRoute>
             <Reports />
@@ -81,7 +81,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "insights",
+        path: 'insights',
         element: (
           <ProtectedRoute>
             <Insights />
@@ -89,7 +89,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "notifications",
+        path: 'notifications',
         element: (
           <ProtectedRoute>
             <Notifications />
@@ -97,7 +97,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "settings",
+        path: 'settings',
         element: (
           <ProtectedRoute requireSuperAdmin>
             <Settings />
@@ -105,7 +105,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "security",
+        path: 'security',
         element: (
           <ProtectedRoute requireSuperAdmin>
             <Security />
@@ -113,7 +113,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "help",
+        path: 'help',
         element: (
           <ProtectedRoute>
             <Help />

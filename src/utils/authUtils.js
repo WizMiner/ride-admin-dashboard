@@ -1,7 +1,7 @@
 // Utility functions for Auth
-export const getToken = () => localStorage.getItem("token");
+export const getToken = () => localStorage.getItem('token');
 
 export const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("admin");
+  localStorage.removeItem('token');
+  localStorage.removeItem('admin');
 };

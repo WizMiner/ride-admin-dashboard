@@ -1,7 +1,7 @@
-import { useContext } from "react";
-import { Navigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContextDefinition";
-import Spinner from "../components/ui/Spinner.jsx";
+import { useContext } from 'react';
+import { Navigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContextDefinition';
+import Spinner from '../components/ui/Spinner.jsx';
 
 const ProtectedRoute = ({ children, requireSuperAdmin = false }) => {
   const { auth } = useContext(AuthContext);
