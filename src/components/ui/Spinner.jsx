@@ -1,10 +1,21 @@
-const Spinner = ({ size = 12, color = 'blue-500', text = 'Loading...' }) => {
+import React from 'react';
+import { cn } from '../../common/utils';
+
+const Spinner = ({ size = 'medium', className }) => {
+  const sizeClasses = {
+    small: 'w-4 h-4',
+    medium: 'w-8 h-8',
+    large: 'w-12 h-12',
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    <div className={cn('flex justify-center items-center', className)}>
       <div
-        className={`animate-spin rounded-full h-${size} w-${size} border-t-4 border-b-4 border-${color} mb-4`}
-      ></div>
-      <p className="text-gray-500 text-lg">{text}</p>
+        className={cn(
+          'animate-spin rounded-full border-2 border-gray-300 border-t-blue-600',
+          sizeClasses[size]
+        )}
+      />
     </div>
   );
 };

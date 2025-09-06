@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
+  Key,
+  UserCog,
   Home,
   Users,
   Car,
@@ -52,8 +54,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       group: 'management',
       title: 'Management',
       items: [
-        { path: '/users', label: 'Users', icon: Users },
+        { path: '/admins', label: 'Admins', icon: UserCog },
+        { path: '/roles', label: 'Roles', icon: Shield },
+        { path: '/staffs', label: 'Staffs', icon: Users },
         { path: '/drivers', label: 'Drivers', icon: Car },
+        { path: '/Passengers', label: 'Passengers', icon: Users },
+        { path: '/permissions', label: 'Permissions', icon: Key },
         { path: '/rides', label: 'Rides', icon: MapPin },
         { path: '/payments', label: 'Payments', icon: CreditCard },
       ],

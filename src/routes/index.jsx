@@ -1,10 +1,14 @@
 import { createBrowserRouter } from 'react-router-dom';
-import Layout from '../components/layout/Layout.jsx';
-import Dashboard from '../pages/Dashboard.jsx';
-import Users from '../pages/Users.jsx';
-import Drivers from '../pages/Drivers.jsx';
-import Login from '../pages/Login.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
+import Layout from '../components/layout/Layout.jsx';
+import Login from '../pages/Login.jsx';
+import Dashboard from '../pages/Dashboard.jsx';
+import Admins from '../pages/admin/Admins.jsx';
+import Passengers from '../pages/passenger/Passengers.jsx';
+import Drivers from '../pages/driver/Drivers.jsx';
+import Staffs from '../pages/staff/Staffs.jsx';
+import Roles from '../pages/role/Roles.jsx';
+import Permissions from '../pages/permission/Permissions.jsx';
 import Rides from '../pages/Rides.jsx';
 import Payments from '../pages/Payments.jsx';
 import Analytics from '../pages/Analytics.jsx';
@@ -41,10 +45,18 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'users',
+        path: 'admins',
         element: (
           <ProtectedRoute>
-            <Users />
+            <Admins />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'Passengers',
+        element: (
+          <ProtectedRoute>
+            <Passengers />
           </ProtectedRoute>
         ),
       },
@@ -53,6 +65,30 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Drivers />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'staffs',
+        element: (
+          <ProtectedRoute>
+            <Staffs />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'roles',
+        element: (
+          <ProtectedRoute>
+            <Roles />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'permissions',
+        element: (
+          <ProtectedRoute>
+            <Permissions />
           </ProtectedRoute>
         ),
       },
