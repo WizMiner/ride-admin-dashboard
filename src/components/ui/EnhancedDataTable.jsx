@@ -1,6 +1,6 @@
 // File: src/components/ui/EnhancedDataTable.jsx
-import React from 'react';
-import { Eye, Edit, Trash2 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Eye, Edit, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '../../common/utils';
 import { useTheme } from '../../hooks/useTheme.jsx';
 import { getPalette } from '../../common/themes';
@@ -12,9 +12,51 @@ const EnhancedDataTable = ({
   onDelete,
   onView,
   isLoading = false,
+  pageSizeOptions = [5, 10, 20],
+  defaultPageSize = 10,
 }) => {
   const { currentTheme } = useTheme();
   const palette = getPalette(currentTheme);
+
+  // 🔹 Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(defaultPageSize);
+
+  // 🔹 Sorting state
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  // 🔹 Sorting logic
+  const sortedData = useMemo(() => {
+    if (!sortConfig.key) return data;
+    return [...data].sort((a, b) => {
+      const valA = a[sortConfig.key];
+      const valB = b[sortConfig.key];
+      if (valA == null) return 1;
+      if (valB == null) return -1;
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return sortConfig.direction === 'asc' ? valA - valB : valB - valA;
+      }
+      return sortConfig.direction === 'asc'
+        ? valA.toString().localeCompare(valB.toString())
+        : valB.toString().localeCompare(valA.toString());
+    });
+  }, [data, sortConfig]);
+
+  // 🔹 Pagination logic
+  const paginatedData = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return sortedData.slice(start, start + pageSize);
+  }, [sortedData, currentPage, pageSize]);
+
+  const totalPages = Math.ceil(data.length / pageSize);
+
+  const handleSort = (key) => {
+    setSortConfig((prev) =>
+      prev.key === key && prev.direction === 'asc'
+        ? { key, direction: 'desc' }
+        : { key, direction: 'asc' }
+    );
+  };
 
   if (isLoading) {
     return (
@@ -44,101 +86,157 @@ const EnhancedDataTable = ({
   }
 
   return (
-    <div
-      className={cn(
-        'rounded-lg shadow-sm overflow-x-auto',
-        palette.card,
-        palette.border
-      )}
-    >
-      <table className="w-full">
-        <thead>
-          <tr className={cn('border-b', palette.border)}>
-            {columns.map((column) => (
+    <div className="space-y-4">
+      {/* Table */}
+      <div
+        className={cn(
+          'rounded-lg shadow-sm overflow-x-auto',
+          palette.card,
+          palette.border
+        )}
+      >
+        <table className="w-full">
+          <thead>
+            <tr className={cn('border-b', palette.border)}>
+              {columns.map((column) => (
+                <th
+                  key={column.key}
+                  onClick={() => handleSort(column.key)}
+                  className={cn(
+                    'text-left p-4 font-medium text-sm uppercase tracking-wider cursor-pointer select-none',
+                    palette.mutedText,
+                    palette.primaryLightBg
+                  )}
+                >
+                  <div className="flex items-center gap-1">
+                    {column.title}
+                    {sortConfig.key === column.key &&
+                      (sortConfig.direction === 'asc' ? (
+                        <ChevronUp size={14} />
+                      ) : (
+                        <ChevronDown size={14} />
+                      ))}
+                  </div>
+                </th>
+              ))}
               <th
-                key={column.key}
                 className={cn(
                   'text-left p-4 font-medium text-sm uppercase tracking-wider',
                   palette.mutedText,
-                  palette.primaryLightBg // Using existing primaryLightBg for header background
+                  palette.primaryLightBg
                 )}
               >
-                {column.title}
+                Actions
               </th>
-            ))}
-            <th
-              className={cn(
-                'text-left p-4 font-medium text-sm uppercase tracking-wider',
-                palette.mutedText,
-                palette.primaryLightBg // Using existing primaryLightBg for header background
-              )}
-            >
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((item, index) => (
-            <tr
-              key={item.id || index}
-              className={cn(
-                'border-b',
-                palette.border,
-                palette.hover // Using theme's hover class
-              )}
-            >
-              {columns.map((column) => (
-                <td key={column.key} className="p-4">
-                  {column.render ? column.render(item) : item[column.key]}
-                </td>
-              ))}
-              <td className="p-4">
-                <div className="flex items-center gap-2">
-                  {onView && (
-                    <button
-                      className={cn(
-                        'p-2 rounded transition-colors',
-                        palette.mutedText,
-                        'hover:text-primary-500 hover:bg-primary-100 dark:hover:bg-primary-900/20'
-                      )}
-                      title="View Details"
-                      onClick={() => onView(item)}
-                    >
-                      <Eye size={16} />
-                    </button>
-                  )}
-                  {onEdit && (
-                    <button
-                      className={cn(
-                        'p-2 rounded transition-colors',
-                        palette.mutedText,
-                        'hover:text-green-600 hover:bg-green-100 dark:hover:bg-green-900/20'
-                      )}
-                      title="Edit"
-                      onClick={() => onEdit(item)}
-                    >
-                      <Edit size={16} />
-                    </button>
-                  )}
-                  {onDelete && (
-                    <button
-                      className={cn(
-                        'p-2 rounded transition-colors',
-                        palette.mutedText,
-                        'hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20'
-                      )}
-                      title="Delete"
-                      onClick={() => onDelete(item)}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  )}
-                </div>
-              </td>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {paginatedData.map((item, index) => (
+              <tr
+                key={item.id || index}
+                className={cn('border-b', palette.border, palette.hover)}
+              >
+                {columns.map((column) => (
+                  <td key={column.key} className="p-4">
+                    {column.render ? column.render(item) : item[column.key]}
+                  </td>
+                ))}
+                <td className="p-4">
+                  <div className="flex items-center gap-2">
+                    {onView && (
+                      <button
+                        className={cn(
+                          'p-2 rounded transition-colors',
+                          palette.mutedText,
+                          'hover:text-primary-500 hover:bg-primary-100 dark:hover:bg-primary-900/20'
+                        )}
+                        title="View Details"
+                        onClick={() => onView(item)}
+                      >
+                        <Eye size={16} />
+                      </button>
+                    )}
+                    {onEdit && (
+                      <button
+                        className={cn(
+                          'p-2 rounded transition-colors',
+                          palette.mutedText,
+                          'hover:text-green-600 hover:bg-green-100 dark:hover:bg-green-900/20'
+                        )}
+                        title="Edit"
+                        onClick={() => onEdit(item)}
+                      >
+                        <Edit size={16} />
+                      </button>
+                    )}
+                    {onDelete && (
+                      <button
+                        className={cn(
+                          'p-2 rounded transition-colors',
+                          palette.mutedText,
+                          'hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20'
+                        )}
+                        title="Delete"
+                        onClick={() => onDelete(item)}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination controls */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <span className={cn('text-sm', palette.mutedText)}>
+            Rows per page:
+          </span>
+          <select
+            value={pageSize}
+            onChange={(e) => {
+              setPageSize(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className={cn(
+              'px-2 py-1 border rounded',
+              palette.border,
+              palette.card,
+              palette.text
+            )}
+          >
+            {pageSizeOptions.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            className="px-2 py-1 border rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
+          <span className="text-sm">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+            className="px-2 py-1 border rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

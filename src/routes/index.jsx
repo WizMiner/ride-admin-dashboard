@@ -1,8 +1,9 @@
+//src/routes/index.jsx
 import { createBrowserRouter } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import Layout from '../components/layout/Layout.jsx';
 import Login from '../pages/Login.jsx';
-import Dashboard from '../pages/Dashboard.jsx';
+import Dashboard from '../pages/dashboard/Dashboard.jsx';
 import Admins from '../pages/admin/Admins.jsx';
 import Passengers from '../pages/passenger/Passengers.jsx';
 import Drivers from '../pages/driver/Drivers.jsx';
@@ -11,13 +12,18 @@ import Roles from '../pages/role/Roles.jsx';
 import Permissions from '../pages/permission/Permissions.jsx';
 import Rides from '../pages/Rides.jsx';
 import Payments from '../pages/Payments.jsx';
-import Analytics from '../pages/Analytics.jsx';
+import Analytics from '../pages/dashboard/Analytics.jsx';
 import Reports from '../pages/Reports.jsx';
 import Insights from '../pages/Insights.jsx';
 import Notifications from '../pages/Notifications.jsx';
 import Settings from '../pages/Settings.jsx';
 import Security from '../pages/Security.jsx';
 import Help from '../pages/Help.jsx';
+
+import Bookings from '../pages/booking/Bookings';
+import Trips from '../pages/trip/Trips';
+import Pricing from '../pages/pricing/Pricing.jsx';
+import Live from '../pages/live/Live.jsx';
 
 export const router = createBrowserRouter([
   {
@@ -53,8 +59,9 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'Passengers',
+        path: 'passengers',
         element: (
+          // <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
           <ProtectedRoute>
             <Passengers />
           </ProtectedRoute>
@@ -109,6 +116,38 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'bookings',
+        element: (
+          <ProtectedRoute>
+            <Bookings />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'trips',
+        element: (
+          <ProtectedRoute>
+            <Trips />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'pricing',
+        element: (
+          <ProtectedRoute>
+            <Pricing />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'lives',
+        element: (
+          <ProtectedRoute>
+            <Live />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: 'reports',
         element: (
           <ProtectedRoute>
@@ -135,7 +174,7 @@ export const router = createBrowserRouter([
       {
         path: 'settings',
         element: (
-          <ProtectedRoute requireSuperAdmin>
+          <ProtectedRoute>
             <Settings />
           </ProtectedRoute>
         ),

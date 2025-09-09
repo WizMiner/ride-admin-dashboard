@@ -35,13 +35,18 @@ export const themes = {
       avatarBg: 'bg-blue-600',
       iconText: 'text-blue-600',
       primaryLightBg: 'bg-blue-100',
-      sidebarBg: 'bg-white',
+      sidebarBg: 'bg-blue-50',
       sidebarText: 'text-gray-600',
       sidebarMuted: 'text-gray-500',
       sidebarBorder: 'border-gray-200',
-      sidebarHoverBg: 'hover:bg-gray-100',
-      sidebarActiveBg: 'bg-gray-100',
-      sidebarActiveText: 'text-gray-900',
+      sidebarHoverBg: 'hover:bg-blue-100',
+      sidebarActiveBg: 'bg-blue-100',
+      sidebarActiveText: 'text-blue-700',
+    },
+    chartColors: {
+      primary: '#1E90FF',
+      accent: '#FFA500',
+      secondary: '#3CB371',
     },
   },
 
@@ -79,6 +84,11 @@ export const themes = {
       sidebarActiveBg: 'bg-gray-800',
       sidebarActiveText: 'text-white',
     },
+    chartColors: {
+      primary: '#60A5FA',
+      accent: '#FBBF24',
+      secondary: '#4ADE80',
+    },
   },
 
   green: {
@@ -107,13 +117,18 @@ export const themes = {
       avatarBg: 'bg-green-600',
       iconText: 'text-green-600',
       primaryLightBg: 'bg-green-100',
-      sidebarBg: 'bg-white',
+      sidebarBg: 'bg-green-50',
       sidebarText: 'text-gray-600',
       sidebarMuted: 'text-gray-500',
       sidebarBorder: 'border-gray-200',
-      sidebarHoverBg: 'hover:bg-gray-100',
-      sidebarActiveBg: 'bg-green-50',
+      sidebarHoverBg: 'hover:bg-green-100',
+      sidebarActiveBg: 'bg-green-100',
       sidebarActiveText: 'text-green-700',
+    },
+    chartColors: {
+      primary: '#10B981',
+      accent: '#FCD34D',
+      secondary: '#34D399',
     },
   },
 
@@ -143,13 +158,18 @@ export const themes = {
       avatarBg: 'bg-purple-600',
       iconText: 'text-purple-600',
       primaryLightBg: 'bg-purple-100',
-      sidebarBg: 'bg-white',
+      sidebarBg: 'bg-purple-50',
       sidebarText: 'text-gray-600',
       sidebarMuted: 'text-gray-500',
       sidebarBorder: 'border-gray-200',
-      sidebarHoverBg: 'hover:bg-gray-100',
-      sidebarActiveBg: 'bg-purple-50',
+      sidebarHoverBg: 'hover:bg-purple-100',
+      sidebarActiveBg: 'bg-purple-100',
       sidebarActiveText: 'text-purple-700',
+    },
+    chartColors: {
+      primary: '#8B5CF6',
+      accent: '#EC4899',
+      secondary: '#A78BFA',
     },
   },
 
@@ -179,13 +199,18 @@ export const themes = {
       avatarBg: 'bg-orange-600',
       iconText: 'text-orange-600',
       primaryLightBg: 'bg-orange-100',
-      sidebarBg: 'bg-white',
+      sidebarBg: 'bg-orange-50',
       sidebarText: 'text-gray-600',
       sidebarMuted: 'text-gray-500',
       sidebarBorder: 'border-gray-200',
-      sidebarHoverBg: 'hover:bg-gray-100',
-      sidebarActiveBg: 'bg-orange-50',
+      sidebarHoverBg: 'hover:bg-orange-100',
+      sidebarActiveBg: 'bg-orange-100',
       sidebarActiveText: 'text-orange-700',
+    },
+    chartColors: {
+      primary: '#F97316',
+      accent: '#3B82F6',
+      secondary: '#FB923C',
     },
   },
 
@@ -215,13 +240,18 @@ export const themes = {
       avatarBg: 'bg-teal-600',
       iconText: 'text-teal-600',
       primaryLightBg: 'bg-teal-100',
-      sidebarBg: 'bg-white',
+      sidebarBg: 'bg-teal-50',
       sidebarText: 'text-gray-600',
       sidebarMuted: 'text-gray-500',
       sidebarBorder: 'border-gray-200',
-      sidebarHoverBg: 'hover:bg-gray-100',
-      sidebarActiveBg: 'bg-teal-50',
+      sidebarHoverBg: 'hover:bg-teal-100',
+      sidebarActiveBg: 'bg-teal-100',
       sidebarActiveText: 'text-teal-700',
+    },
+    chartColors: {
+      primary: '#2DD4BF',
+      accent: '#A78BFA',
+      secondary: '#5EEAD4',
     },
   },
 
@@ -251,13 +281,18 @@ export const themes = {
       avatarBg: 'bg-indigo-600',
       iconText: 'text-indigo-600',
       primaryLightBg: 'bg-indigo-100',
-      sidebarBg: 'bg-white',
+      sidebarBg: 'bg-indigo-50',
       sidebarText: 'text-gray-600',
       sidebarMuted: 'text-gray-500',
       sidebarBorder: 'border-gray-200',
-      sidebarHoverBg: 'hover:bg-gray-100',
-      sidebarActiveBg: 'bg-indigo-50',
+      sidebarHoverBg: 'hover:bg-indigo-100',
+      sidebarActiveBg: 'bg-indigo-100',
       sidebarActiveText: 'text-indigo-700',
+    },
+    chartColors: {
+      primary: '#6366F1',
+      accent: '#F472B6',
+      secondary: '#818CF8',
     },
   },
 
@@ -287,13 +322,18 @@ export const themes = {
       avatarBg: 'bg-rose-600',
       iconText: 'text-rose-600',
       primaryLightBg: 'bg-rose-100',
-      sidebarBg: 'bg-white',
+      sidebarBg: 'bg-rose-50',
       sidebarText: 'text-gray-600',
       sidebarMuted: 'text-gray-500',
       sidebarBorder: 'border-gray-200',
-      sidebarHoverBg: 'hover:bg-gray-100',
-      sidebarActiveBg: 'bg-rose-50',
+      sidebarHoverBg: 'hover:bg-rose-100',
+      sidebarActiveBg: 'bg-rose-100',
       sidebarActiveText: 'text-rose-700',
+    },
+    chartColors: {
+      primary: '#F43F5E',
+      accent: '#22C55E',
+      secondary: '#FB7185',
     },
   },
 
@@ -323,13 +363,18 @@ export const themes = {
       avatarBg: 'bg-emerald-600',
       iconText: 'text-emerald-600',
       primaryLightBg: 'bg-emerald-100',
-      sidebarBg: 'bg-white',
+      sidebarBg: 'bg-emerald-50',
       sidebarText: 'text-gray-600',
       sidebarMuted: 'text-gray-500',
       sidebarBorder: 'border-gray-200',
-      sidebarHoverBg: 'hover:bg-gray-100',
-      sidebarActiveBg: 'bg-emerald-50',
+      sidebarHoverBg: 'hover:bg-emerald-100',
+      sidebarActiveBg: 'bg-emerald-100',
       sidebarActiveText: 'text-emerald-700',
+    },
+    chartColors: {
+      primary: '#059669',
+      accent: '#A855F7',
+      secondary: '#10B981',
     },
   },
 };
@@ -347,8 +392,12 @@ export const getThemeList = () =>
 // Backwards-compatible palette getter (returns the static Tailwind classes)
 export const getPalette = (themeName) => {
   const t = themes[themeName];
-  if (!t) return themes[DEFAULT_THEME].classes;
-  return t.classes;
+  if (!t)
+    return {
+      ...themes[DEFAULT_THEME].classes,
+      chartColors: themes[DEFAULT_THEME].chartColors,
+    };
+  return { ...t.classes, chartColors: t.chartColors };
 };
 
 // Apply theme: write CSS variables (H S% L% triplets) to :root and set data-theme attr

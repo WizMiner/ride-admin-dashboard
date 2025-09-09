@@ -7,6 +7,7 @@ import { useTheme } from '../hooks/useTheme';
 const Login = () => {
   const { login } = useContext(AuthContext);
   const { currentTheme } = useTheme();
+  const [userType, setUserType] = useState('admin'); // Added userType state
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -17,11 +18,27 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const result = await login(username, password);
+
+    // Pass userType to the login function
+    const result = await login(username, password, userType);
     setLoading(false);
 
-    if (result.success) navigate('/');
-    else setError(result.message);
+    if (result.success) {
+      // You might want more specific navigation based on role here,
+      // but for now, both staff and admin navigate to home.
+      if (
+        result.role === 'staff' ||
+        result.role === 'admin' ||
+        result.role === 'superadmin'
+      ) {
+        navigate('/');
+      } else {
+        // Handle unexpected roles or default to home
+        navigate('/');
+      }
+    } else {
+      setError(result.message);
+    }
   };
 
   const handleCancel = () => {
@@ -84,13 +101,40 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Role selection */}
+          <div className="relative">
+            <select
+              value={userType}
+              onChange={(e) => setUserType(e.target.value)}
+              className={cn(
+                `peer w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition ${
+                  currentTheme === 'dark'
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-800'
+                }`
+              )}
+            >
+              <option value="admin">Admin / Super Admin</option>
+              <option value="staff">Staff</option>
+            </select>
+            <label
+              className={`absolute left-4 -top-2.5 px-1 text-xs font-medium transition-all ${
+                currentTheme === 'dark'
+                  ? 'bg-gray-700 text-primary-400'
+                  : 'bg-white text-primary-500'
+              }`}
+            >
+              Role
+            </label>
+          </div>
+
           {/* Username */}
           <div className="relative">
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Username"
+              placeholder=" " // Use a space to make the placeholder "disappear" when focused
               required
               className={cn(
                 `peer w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition ${
@@ -117,7 +161,7 @@ const Login = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
+              placeholder=" " // Use a space
               required
               className={cn(
                 `peer w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition ${
@@ -184,7 +228,8 @@ const Login = () => {
               type="submit"
               disabled={loading}
               className={cn(
-                'w-2/3 flex justify-center items-center py-3 rounded-lg font-medium text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 transition disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
+                'w-2/3 flex justify-center items-center py-3 rounded-lg font-medium text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 transition disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+                currentTheme === 'dark' && 'focus:ring-offset-gray-800' // Adjust ring offset for dark theme
               )}
             >
               {loading ? (

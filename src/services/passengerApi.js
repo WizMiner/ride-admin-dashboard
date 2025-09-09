@@ -1,4 +1,4 @@
-import api from './authapi';
+import api from './auth';
 
 export const passengerApi = {
   list: () => api.get('/passengers'),

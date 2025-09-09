@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
+  CalendarCheck,
+  Radio,
   Key,
   UserCog,
   Home,
@@ -58,10 +60,20 @@ const Sidebar = ({ isOpen, onClose }) => {
         { path: '/roles', label: 'Roles', icon: Shield },
         { path: '/staffs', label: 'Staffs', icon: Users },
         { path: '/drivers', label: 'Drivers', icon: Car },
-        { path: '/Passengers', label: 'Passengers', icon: Users },
+        { path: '/passengers', label: 'Passengers', icon: Users },
         { path: '/permissions', label: 'Permissions', icon: Key },
         { path: '/rides', label: 'Rides', icon: MapPin },
         { path: '/payments', label: 'Payments', icon: CreditCard },
+      ],
+    },
+    {
+      group: 'Bookings',
+      title: 'Bookings',
+      items: [
+        { path: '/bookings', label: 'Bookings', icon: CalendarCheck },
+        { path: '/trips', label: 'Trips', icon: Car },
+        { path: '/pricing', label: 'Pricing', icon: CreditCard },
+        { path: '/lives', label: 'Live', icon: Radio },
       ],
     },
     {

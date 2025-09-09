@@ -1,4 +1,4 @@
-import api from './authapi';
+import api from './auth';
 
 export const driverApi = {
   list: () => api.get('/drivers'),

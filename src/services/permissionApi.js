@@ -1,4 +1,4 @@
-import api from './authapi';
+import api from './auth';
 
 export const permissionApi = {
   list: () => api.get('/permissions'),

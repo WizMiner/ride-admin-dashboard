@@ -1,6 +1,7 @@
+//src/contexts/AuthContext.jsx
 import { useState, useEffect, useCallback } from 'react';
 import { AuthContext } from './AuthContextDefinition';
-import api from '../services/authapi';
+import api from '../services/auth';
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
@@ -48,37 +49,42 @@ export const AuthProvider = ({ children }) => {
     }
   }, [auth.token, logout]);
 
-  const login = async (username, password) => {
+  const login = async (username, password, userType = 'admin') => {
     try {
-      const { data } = await api.post('/auth/admin/login', {
-        username,
-        password,
-      });
+      // pick endpoint depending on user type (UI decides)
+      const endpoint =
+        userType === 'staff' ? '/auth/staff/login' : '/auth/admin/login';
+      const { data } = await api.post(endpoint, { username, password });
 
       if (data.token) {
+        // decode token
+        const decoded = JSON.parse(atob(data.token.split('.')[1]));
+
+        let role = decoded.type; // "admin" or "staff"
+        let isSuperAdmin = false;
+
+        if (decoded.type === 'admin') {
+          // Check if roles array has super admin
+          isSuperAdmin = decoded.roles?.includes('superadmin') || false;
+          if (isSuperAdmin) role = 'superadmin';
+        }
+
+        // save to localStorage
         localStorage.setItem('token', data.token);
-        localStorage.setItem('admin', JSON.stringify(data.admin));
-
-        const isSuperAdmin =
-          data.admin.roles?.some(
-            (role) => role.name === 'superadmin' || role === 'superadmin'
-          ) || false;
-
-        const permissions =
-          data.admin.roles?.flatMap(
-            (role) => role.permissions?.map((p) => p.name) || []
-          ) || [];
+        localStorage.setItem('user', JSON.stringify(data.admin || data.staff));
+        localStorage.setItem('role', role);
 
         setAuth({
           token: data.token,
-          admin: data.admin,
+          user: data.admin || data.staff,
+          role, // "super admin" | "admin" | "staff"
           isAuthenticated: true,
           isSuperAdmin,
-          permissions,
+          permissions: decoded.permissions || [],
           loading: false,
         });
 
-        return { success: true };
+        return { success: true, role };
       }
 
       return { success: false, message: data.message || 'Invalid credentials' };
