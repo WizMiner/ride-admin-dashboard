@@ -1,4 +1,4 @@
-//src/hooks/useCrud.js
+// src/hooks/useCrud.js
 import { useState, useEffect, useCallback } from 'react';
 
 const useCrud = (api, initialFilters = {}) => {
@@ -13,6 +13,9 @@ const useCrud = (api, initialFilters = {}) => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [mode, setMode] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Helper: get correct ID field (id or _id)
+  const getEntityId = (entity) => entity?.id || entity?._id;
 
   // Load data from API
   const loadData = useCallback(async () => {
@@ -93,7 +96,9 @@ const useCrud = (api, initialFilters = {}) => {
     if (!entityToDelete) return;
     setActionLoading(true);
     try {
-      await api.delete(entityToDelete.id);
+      const id = getEntityId(entityToDelete);
+      if (!id) throw new Error('No valid ID found for delete');
+      await api.delete(id);
       await loadData();
       setIsAlertOpen(false);
       setEntityToDelete(null);
@@ -108,7 +113,9 @@ const useCrud = (api, initialFilters = {}) => {
     setActionLoading(true);
     try {
       if (selectedEntity) {
-        await api.update(entity.id, entity);
+        const id = getEntityId(selectedEntity);
+        if (!id) throw new Error('No valid ID found for update');
+        await api.update(id, entity);
       } else {
         await api.create(entity);
       }

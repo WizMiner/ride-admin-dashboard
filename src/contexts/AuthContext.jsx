@@ -1,4 +1,4 @@
-//src/contexts/AuthContext.jsx
+// src/contexts/AuthContext.jsx
 import { useState, useEffect, useCallback } from 'react';
 import { AuthContext } from './AuthContextDefinition';
 import api from '../services/auth';
@@ -6,7 +6,8 @@ import api from '../services/auth';
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     token: localStorage.getItem('token'),
-    admin: JSON.parse(localStorage.getItem('admin') || 'null'),
+    user: JSON.parse(localStorage.getItem('user') || 'null'),
+    roles: JSON.parse(localStorage.getItem('roles') || '[]'),
     isAuthenticated: false,
     isSuperAdmin: false,
     permissions: [],
@@ -15,10 +16,12 @@ export const AuthProvider = ({ children }) => {
 
   const logout = useCallback(() => {
     localStorage.removeItem('token');
-    localStorage.removeItem('admin');
+    localStorage.removeItem('user');
+    localStorage.removeItem('roles');
     setAuth({
       token: null,
-      admin: null,
+      user: null,
+      roles: [],
       isAuthenticated: false,
       isSuperAdmin: false,
       permissions: [],
@@ -26,18 +29,29 @@ export const AuthProvider = ({ children }) => {
     });
   }, []);
 
-  // Initialize on load
+  // Initialize on load (decode JWT)
   useEffect(() => {
     if (auth.token) {
       try {
         const decoded = JSON.parse(atob(auth.token.split('.')[1]));
-        const isSuperAdmin = decoded.roles?.includes('superadmin') || false;
+
+        // Normalize roles
+        let normalizedRoles = [];
+        if (decoded.roles && decoded.roles.length > 0) {
+          normalizedRoles = decoded.roles; // e.g. ["superadmin"]
+        } else if (decoded.type) {
+          normalizedRoles = [decoded.type]; // fallback (admin / staff)
+        }
+
+        const isSuperAdmin = normalizedRoles.includes('superadmin');
         const permissions = decoded.permissions || [];
+
         setAuth((prev) => ({
           ...prev,
           isAuthenticated: true,
           isSuperAdmin,
           permissions,
+          roles: normalizedRoles,
           loading: false,
         }));
       } catch (error) {
@@ -51,40 +65,40 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password, userType = 'admin') => {
     try {
-      // pick endpoint depending on user type (UI decides)
+      // choose endpoint
       const endpoint =
         userType === 'staff' ? '/auth/staff/login' : '/auth/admin/login';
       const { data } = await api.post(endpoint, { username, password });
 
       if (data.token) {
-        // decode token
         const decoded = JSON.parse(atob(data.token.split('.')[1]));
 
-        let role = decoded.type; // "admin" or "staff"
-        let isSuperAdmin = false;
-
-        if (decoded.type === 'admin') {
-          // Check if roles array has super admin
-          isSuperAdmin = decoded.roles?.includes('superadmin') || false;
-          if (isSuperAdmin) role = 'superadmin';
+        // normalize roles
+        let normalizedRoles = [];
+        if (decoded.roles && decoded.roles.length > 0) {
+          normalizedRoles = decoded.roles;
+        } else if (decoded.type) {
+          normalizedRoles = [decoded.type];
         }
 
-        // save to localStorage
+        const isSuperAdmin = normalizedRoles.includes('superadmin');
+
+        // save
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.admin || data.staff));
-        localStorage.setItem('role', role);
+        localStorage.setItem('roles', JSON.stringify(normalizedRoles));
 
         setAuth({
           token: data.token,
           user: data.admin || data.staff,
-          role, // "super admin" | "admin" | "staff"
+          roles: normalizedRoles,
           isAuthenticated: true,
           isSuperAdmin,
           permissions: decoded.permissions || [],
           loading: false,
         });
 
-        return { success: true, role };
+        return { success: true, roles: normalizedRoles };
       }
 
       return { success: false, message: data.message || 'Invalid credentials' };

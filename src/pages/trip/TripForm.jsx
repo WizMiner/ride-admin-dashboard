@@ -152,8 +152,10 @@ const TripForm = ({
               )}
               required
             >
+              <option value="accepted">Accepted</option>
+              <option value="ongoing">Ongoing</option>
               <option value="completed">Completed</option>
-              <option value="in_progress">In Progress</option>
+              <option value="canceled">Canceled</option>
             </select>
           </div>
 

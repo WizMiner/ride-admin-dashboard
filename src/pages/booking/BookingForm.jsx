@@ -72,25 +72,6 @@ const BookingForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-          Passenger ID
-        </label>
-        <input
-          type="text"
-          name="passengerId"
-          value={formData.passengerId}
-          onChange={handleChange}
-          className={cn(
-            'w-full p-2 border rounded',
-            palette.border,
-            palette.card,
-            palette.text
-          )}
-          required
-        />
-      </div>
-
-      <div>
-        <label className={cn('block text-sm font-medium mb-1', palette.text)}>
           Vehicle Type
         </label>
         <select
@@ -116,7 +97,7 @@ const BookingForm = ({
           Pickup Latitude
         </label>
         <input
-          type="number"
+          type="integer"
           step="any"
           name="pickupLatitude"
           value={formData.pickupLatitude}
@@ -136,7 +117,7 @@ const BookingForm = ({
           Pickup Longitude
         </label>
         <input
-          type="number"
+          type="integer"
           step="any"
           name="pickupLongitude"
           value={formData.pickupLongitude}
@@ -156,7 +137,7 @@ const BookingForm = ({
           Dropoff Latitude
         </label>
         <input
-          type="number"
+          type="integer"
           step="any"
           name="dropoffLatitude"
           value={formData.dropoffLatitude}
@@ -176,7 +157,7 @@ const BookingForm = ({
           Dropoff Longitude
         </label>
         <input
-          type="number"
+          type="integer"
           step="any"
           name="dropoffLongitude"
           value={formData.dropoffLongitude}

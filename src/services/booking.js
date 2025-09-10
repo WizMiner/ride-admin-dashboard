@@ -1,5 +1,6 @@
-//src/services/booking.js
+// src/services/booking.js
 import axios from 'axios';
+import { getToken } from '../utils/authUtils';
 
 const bookingApiInstance = axios.create({
   baseURL: import.meta.env.VITE_BOOKING_BACKEND_API,
@@ -8,9 +9,9 @@ const bookingApiInstance = axios.create({
   },
 });
 
-// Optional: attach token if needed
+// Attach token consistently
 bookingApiInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
