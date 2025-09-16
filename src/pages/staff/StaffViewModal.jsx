@@ -74,7 +74,7 @@ const StaffViewModal = ({ isOpen, onClose, staff }) => {
               <h3 className={cn('text-lg font-semibold', palette.text)}>
                 {staff.fullName}
               </h3>
-              <p className={cn('text-sm', palette.mutedText)}>ID: {staff.id}</p>
+              {/* <p className={cn('text-sm', palette.mutedText)}>ID: {staff.id}</p> */}
               <p className={cn('text-sm', palette.mutedText)}>
                 Username: {staff.username}
               </p>
@@ -131,7 +131,7 @@ const StaffViewModal = ({ isOpen, onClose, staff }) => {
                     Salary:
                   </span>
                   <span className={cn('text-sm font-medium', palette.text)}>
-                    ${parseFloat(staff.salary || 0).toFixed(2)}
+                    Birr {parseFloat(staff.salary || 0).toFixed(2)}
                   </span>
                 </div>
                 {staff.bankAccountNo && (

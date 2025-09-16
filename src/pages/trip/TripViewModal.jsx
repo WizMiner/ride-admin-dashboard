@@ -1,15 +1,6 @@
 // src/pages/trip/TripViewModal.jsx
 import React from 'react';
-import {
-  X,
-  User,
-  Car,
-  MapPin,
-  DollarSign,
-  Clock,
-  CheckCircle,
-  Calendar,
-} from 'lucide-react';
+import { X, User, Clock, CheckCircle, Calendar } from 'lucide-react';
 import { cn } from '../../common/utils.js';
 import { useTheme } from '../../hooks/useTheme.jsx';
 import { getPalette } from '../../common/themes.js';

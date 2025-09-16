@@ -55,9 +55,9 @@ const PricingViewModal = ({ isOpen, onClose, pricing }) => {
               <h3 className={cn('text-lg font-semibold', palette.text)}>
                 {pricing.vehicleType}
               </h3>
-              <p className={cn('text-sm', palette.mutedText)}>
+              {/* <p className={cn('text-sm', palette.mutedText)}>
                 ID: {pricing._id}
-              </p>
+              </p> */}
             </div>
           </div>
 

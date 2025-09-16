@@ -8,12 +8,14 @@ import RoleForm from './RoleForm';
 import useCrud from '../../hooks/useCrud';
 import { roleApi } from '../../services/roleApi';
 import RoleViewModal from './RoleViewModal';
+import { useToast } from '../../hooks/useToast.jsx';
 
 const Roles = () => {
   const { currentTheme } = useTheme();
   const palette = getPalette(currentTheme);
 
   const crud = useCrud(roleApi);
+  const { addToast } = useToast();
 
   // Stats
   const totalRoles = crud.data.length;
@@ -49,7 +51,7 @@ const Roles = () => {
             <p className={cn('font-medium', palette.text)}>
               {item.name || 'Unknown'}
             </p>
-            <p className={cn('text-xs', palette.mutedText)}>ID: {item.id}</p>
+            {/* <p className={cn('text-xs', palette.mutedText)}>ID: {item.id}</p> */}
           </div>
         </div>
       ),
@@ -137,6 +139,27 @@ const Roles = () => {
     </>
   );
 
+  const handleSaveWithToast = async (entity) => {
+    try {
+      await crud.handleSave(entity);
+      const message = `Role rule ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`;
+      addToast(message, 'success');
+    } catch (err) {
+      const errorMessage = err?.message || 'An unexpected error occurred.';
+      addToast(errorMessage, 'error');
+    }
+  };
+
+  const handleDeleteWithToast = async () => {
+    try {
+      await crud.handleDeleteConfirm();
+      addToast('Role rule deleted successfully!', 'success');
+    } catch (err) {
+      const errorMessage = err?.message || 'An unexpected error occurred.';
+      addToast(errorMessage, 'error');
+    }
+  };
+
   return (
     <>
       <BaseCrud
@@ -155,14 +178,15 @@ const Roles = () => {
         onModalClose={crud.handleCloseModal}
         isAlertOpen={crud.isAlertOpen}
         onAlertClose={crud.handleCloseAlert}
-        onAlertConfirm={crud.handleDeleteConfirm}
+        onAlertConfirm={handleDeleteWithToast}
         entityToDelete={crud.entityToDelete}
+        actionLoading={crud.actionLoading}
         modalTitle={crud.mode === 'edit' ? 'Edit Role' : 'Add Role'}
         renderStats={renderStats}
         renderForm={() => (
           <RoleForm
             initialData={crud.selectedEntity}
-            onSubmit={crud.handleSave}
+            onSubmit={handleSaveWithToast}
             onCancel={crud.handleCloseModal}
             loading={crud.actionLoading}
             palette={palette}

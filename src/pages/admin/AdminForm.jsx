@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { cn } from '../../common/utils';
 import Spinner from '../../components/ui/Spinner';
+import FormInput from '../../components/forms/FormInput';
 
 const AdminForm = ({
   initialData = {},
@@ -10,8 +11,8 @@ const AdminForm = ({
   loading,
   palette,
 }) => {
-  // Memoize initial data to avoid useEffect infinite loops
   const safeInitialData = useMemo(() => initialData || {}, [initialData]);
+  const isUpdate = !!safeInitialData?.id;
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -22,7 +23,6 @@ const AdminForm = ({
   });
 
   useEffect(() => {
-    // Reset form when initialData changes
     setFormData({ ...safeInitialData, password: '' });
   }, [safeInitialData]);
 
@@ -31,130 +31,66 @@ const AdminForm = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-
-    // Build payload depending on create or update
     const payload = {
       fullName: formData.fullName,
       username: formData.username,
+      email: formData.email,
     };
-
-    if (safeInitialData?.id) {
-      // Update: include email if present
-      if (formData.email) payload.email = formData.email;
-      // Include password only if user entered a new one
-      if (formData.password) payload.password = formData.password;
-      // Include id for update
-      payload.id = safeInitialData.id;
-    } else {
-      // Create: must include password
+    if (isUpdate && formData.password) {
+      payload.password = formData.password;
+    } else if (!isUpdate) {
       payload.password = formData.password;
     }
 
-    onSubmit(payload);
+    try {
+      await onSubmit(payload);
+    } catch (err) {
+      console.error('Error submitting form:', err);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-          Full Name
-        </label>
-        <input
-          type="text"
-          name="fullName"
-          value={formData.fullName || ''}
+    <form onSubmit={handleFormSubmit} className="space-y-4">
+      <FormInput
+        name="fullName"
+        label="Full Name"
+        value={formData.fullName}
+        onChange={handleChange}
+        palette={palette}
+        required
+      />
+
+      <FormInput
+        name="username"
+        label="Username"
+        value={formData.username}
+        onChange={handleChange}
+        palette={palette}
+        required
+      />
+
+      {isUpdate && (
+        <FormInput
+          name="email"
+          label="Email"
+          type="email"
+          value={formData.email}
           onChange={handleChange}
-          className={cn(
-            'w-full p-2 border rounded',
-            palette.border,
-            palette.card,
-            palette.text
-          )}
-          required
+          palette={palette}
         />
-      </div>
-
-      <div>
-        <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-          Username
-        </label>
-        <input
-          type="text"
-          name="username"
-          value={formData.username || ''}
-          onChange={handleChange}
-          className={cn(
-            'w-full p-2 border rounded',
-            palette.border,
-            palette.card,
-            palette.text
-          )}
-          required
-        />
-      </div>
-
-      {safeInitialData?.id && (
-        <div>
-          <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email || ''}
-            onChange={handleChange}
-            className={cn(
-              'w-full p-2 border rounded',
-              palette.border,
-              palette.card,
-              palette.text
-            )}
-          />
-        </div>
       )}
 
-      {!safeInitialData?.id && (
-        <div>
-          <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-            Password
-          </label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password || ''}
-            onChange={handleChange}
-            className={cn(
-              'w-full p-2 border rounded',
-              palette.border,
-              palette.card,
-              palette.text
-            )}
-            required
-          />
-        </div>
-      )}
-
-      {safeInitialData?.id && (
-        <div>
-          <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-            Password (leave empty to keep current)
-          </label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password || ''}
-            onChange={handleChange}
-            className={cn(
-              'w-full p-2 border rounded',
-              palette.border,
-              palette.card,
-              palette.text
-            )}
-          />
-        </div>
-      )}
+      <FormInput
+        name="password"
+        label={isUpdate ? 'Password (leave empty to keep current)' : 'Password'}
+        type="password"
+        value={formData.password}
+        onChange={handleChange}
+        palette={palette}
+        required={!isUpdate}
+      />
 
       <div className="flex justify-end space-x-2 pt-4">
         <button
@@ -179,7 +115,7 @@ const AdminForm = ({
           )}
         >
           {loading && <Spinner size="small" className="mr-2" />}
-          {loading ? 'Saving...' : safeInitialData.id ? 'Update' : 'Create'}
+          {loading ? 'Saving...' : isUpdate ? 'Update' : 'Create'}
         </button>
       </div>
     </form>

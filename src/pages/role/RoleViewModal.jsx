@@ -61,7 +61,7 @@ const RoleViewModal = ({ isOpen, onClose, role }) => {
               <h3 className={cn('text-lg font-semibold', palette.text)}>
                 {role.name}
               </h3>
-              <p className={cn('text-sm', palette.mutedText)}>ID: {role.id}</p>
+              {/* <p className={cn('text-sm', palette.mutedText)}>ID: {role.id}</p> */}
             </div>
           </div>
 

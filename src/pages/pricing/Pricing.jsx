@@ -1,4 +1,4 @@
-// src/pages/pricing/Pricing.jsx
+// File: src/pages/pricing/Pricing.jsx
 import React from 'react';
 import { useTheme } from '../../hooks/useTheme.jsx';
 import { getPalette } from '../../common/themes.js';
@@ -8,12 +8,14 @@ import PricingForm from './PricingForm.jsx';
 import useCrud from '../../hooks/useCrud.js';
 import { pricingApi } from '../../services/pricingApi.js';
 import PricingViewModal from './PricingViewModal.jsx';
+import { useToast } from '../../hooks/useToast.jsx';
 
 const Pricing = () => {
   const { currentTheme } = useTheme();
   const palette = getPalette(currentTheme);
 
   const crud = useCrud(pricingApi);
+  const { addToast } = useToast();
 
   // Stats
   const totalPricing = crud.data.length;
@@ -137,6 +139,27 @@ const Pricing = () => {
     </select>
   );
 
+  const handleSaveWithToast = async (entity) => {
+    try {
+      await crud.handleSave(entity);
+      const message = `Pricing rule ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`;
+      addToast(message, 'success');
+    } catch (err) {
+      const errorMessage = err?.message || 'An unexpected error occurred.';
+      addToast(errorMessage, 'error');
+    }
+  };
+
+  const handleDeleteWithToast = async () => {
+    try {
+      await crud.handleDeleteConfirm();
+      addToast('Pricing rule deleted successfully!', 'success');
+    } catch (err) {
+      const errorMessage = err?.message || 'An unexpected error occurred.';
+      addToast(errorMessage, 'error');
+    }
+  };
+
   return (
     <>
       <BaseCrud
@@ -155,15 +178,16 @@ const Pricing = () => {
         onModalClose={crud.handleCloseModal}
         isAlertOpen={crud.isAlertOpen}
         onAlertClose={crud.handleCloseAlert}
-        onAlertConfirm={crud.handleDeleteConfirm}
+        onAlertConfirm={handleDeleteWithToast}
         entityToDelete={crud.entityToDelete}
+        actionLoading={crud.actionLoading}
         modalTitle={crud.mode === 'edit' ? 'Edit Pricing' : 'Add Pricing'}
         renderStats={renderStats}
         renderFilters={renderFilters}
         renderForm={() => (
           <PricingForm
             initialData={crud.selectedEntity}
-            onSubmit={crud.handleSave}
+            onSubmit={handleSaveWithToast}
             onCancel={crud.handleCloseModal}
             loading={crud.actionLoading}
             palette={palette}

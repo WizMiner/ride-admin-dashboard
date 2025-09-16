@@ -8,12 +8,14 @@ import TripForm from './TripForm.jsx';
 import useCrud from '../../hooks/useCrud.js';
 import { tripApi } from '../../services/tripApi.js';
 import TripViewModal from './TripViewModal.jsx';
+import { useToast } from '../../hooks/useToast.jsx';
 
 const Trips = () => {
   const { currentTheme } = useTheme();
   const palette = getPalette(currentTheme);
 
   const crud = useCrud(tripApi);
+  const { addToast } = useToast();
 
   // Stats
   const totalTrips = crud.data.length;
@@ -146,6 +148,27 @@ const Trips = () => {
     </select>
   );
 
+  const handleSaveWithToast = async (entity) => {
+    try {
+      await crud.handleSave(entity);
+      const message = `Staff rule ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`;
+      addToast(message, 'success');
+    } catch (err) {
+      const errorMessage = err?.message || 'An unexpected error occurred.';
+      addToast(errorMessage, 'error');
+    }
+  };
+
+  const handleDeleteWithToast = async () => {
+    try {
+      await crud.handleDeleteConfirm();
+      addToast('Staff rule deleted successfully!', 'success');
+    } catch (err) {
+      const errorMessage = err?.message || 'An unexpected error occurred.';
+      addToast(errorMessage, 'error');
+    }
+  };
+
   return (
     <>
       <BaseCrud
@@ -164,7 +187,7 @@ const Trips = () => {
         onModalClose={crud.handleCloseModal}
         isAlertOpen={crud.isAlertOpen}
         onAlertClose={crud.handleCloseAlert}
-        onAlertConfirm={crud.handleDeleteConfirm}
+        onAlertConfirm={handleDeleteWithToast}
         entityToDelete={crud.entityToDelete}
         modalTitle={crud.mode === 'edit' ? 'Edit Trip' : 'Add Trip'}
         renderStats={renderStats}
@@ -172,7 +195,7 @@ const Trips = () => {
         renderForm={() => (
           <TripForm
             initialData={crud.selectedEntity}
-            onSubmit={crud.handleSave}
+            onSubmit={handleSaveWithToast}
             onCancel={crud.handleCloseModal}
             loading={crud.actionLoading}
             palette={palette}

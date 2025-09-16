@@ -1,9 +1,8 @@
-// src/hooks/useCrud.js
-import { useState, useEffect, useCallback } from 'react';
+// src/hooks/useCrud.jsx
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 const useCrud = (api, initialFilters = {}) => {
   const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState(initialFilters);
@@ -33,9 +32,8 @@ const useCrud = (api, initialFilters = {}) => {
     }
   }, [api, filters]);
 
-  // Filter data for search and filters
-  const filterData = useCallback(() => {
-    if (!Array.isArray(data)) return setFilteredData([]);
+  const filteredData = useMemo(() => {
+    if (!Array.isArray(data)) return [];
 
     let filtered = [...data];
 
@@ -50,43 +48,42 @@ const useCrud = (api, initialFilters = {}) => {
       );
     }
 
-    // Filters
     Object.entries(filters).forEach(([key, value]) => {
       if (value && value !== 'all') {
         filtered = filtered.filter((item) => item[key] === value);
       }
     });
 
-    setFilteredData(filtered);
+    return filtered;
   }, [data, searchQuery, filters]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  useEffect(() => {
-    filterData();
-  }, [filterData]);
-
   // CRUD handlers
   const handleSearch = (query) => setSearchQuery(query);
   const handleFilter = (key, value) =>
     setFilters((prev) => ({ ...prev, [key]: value }));
+
   const handleAdd = () => {
     setSelectedEntity(null);
     setMode('add');
     setIsModalOpen(true);
   };
+
   const handleEdit = (entity) => {
     setSelectedEntity(entity);
     setMode('edit');
     setIsModalOpen(true);
   };
+
   const handleView = (entity) => {
     setSelectedEntity(entity);
-    setMode(entity ? 'view' : null);
-    setIsModalOpen(!!entity && entity.mode !== 'view');
+    setMode('view');
+    setIsModalOpen(true);
   };
+
   const handleDelete = (entity) => {
     setEntityToDelete(entity);
     setIsAlertOpen(true);
@@ -102,8 +99,10 @@ const useCrud = (api, initialFilters = {}) => {
       await loadData();
       setIsAlertOpen(false);
       setEntityToDelete(null);
+      return Promise.resolve();
     } catch (error) {
       console.error('Delete failed:', error);
+      return Promise.reject(error);
     } finally {
       setActionLoading(false);
     }
@@ -122,8 +121,10 @@ const useCrud = (api, initialFilters = {}) => {
       await loadData();
       setIsModalOpen(false);
       setMode(null);
+      return Promise.resolve();
     } catch (error) {
       console.error('Save failed:', error);
+      return Promise.reject(error);
     } finally {
       setActionLoading(false);
     }

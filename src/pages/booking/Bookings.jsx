@@ -8,12 +8,14 @@ import BookingForm from './BookingForm.jsx';
 import useCrud from '../../hooks/useCrud.js';
 import { bookingApi } from '../../services/bookingApi.js';
 import BookingViewModal from './BookingViewModal.jsx';
+import { useToast } from '../../hooks/useToast.jsx';
 
 const Bookings = () => {
   const { currentTheme } = useTheme();
   const palette = getPalette(currentTheme);
 
   const crud = useCrud(bookingApi);
+  const { addToast } = useToast();
 
   // Stats
   const totalBookings = crud.data.length;
@@ -160,6 +162,27 @@ const Bookings = () => {
     </>
   );
 
+  const handleSaveWithToast = async (entity) => {
+    try {
+      await crud.handleSave(entity);
+      const message = `Booking rule ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`;
+      addToast(message, 'success');
+    } catch (err) {
+      const errorMessage = err?.message || 'An unexpected error occurred.';
+      addToast(errorMessage, 'error');
+    }
+  };
+
+  const handleDeleteWithToast = async () => {
+    try {
+      await crud.handleDeleteConfirm();
+      addToast('Booking rule deleted successfully!', 'success');
+    } catch (err) {
+      const errorMessage = err?.message || 'An unexpected error occurred.';
+      addToast(errorMessage, 'error');
+    }
+  };
+
   const renderFilters = () => (
     <select
       value={crud.filters.status || 'all'}
@@ -197,15 +220,16 @@ const Bookings = () => {
         onModalClose={crud.handleCloseModal}
         isAlertOpen={crud.isAlertOpen}
         onAlertClose={crud.handleCloseAlert}
-        onAlertConfirm={crud.handleDeleteConfirm}
+        onAlertConfirm={handleDeleteWithToast}
         entityToDelete={crud.entityToDelete}
+        actionLoading={crud.actionLoading}
         modalTitle={crud.mode === 'edit' ? 'Edit Booking' : 'Add Booking'}
         renderStats={renderStats}
         renderFilters={renderFilters}
         renderForm={() => (
           <BookingForm
             initialData={crud.selectedEntity}
-            onSubmit={crud.handleSave}
+            onSubmit={handleSaveWithToast}
             onCancel={crud.handleCloseModal}
             loading={crud.actionLoading}
             palette={palette}

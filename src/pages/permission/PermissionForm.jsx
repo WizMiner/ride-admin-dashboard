@@ -44,17 +44,6 @@ const PermissionForm = ({ initialData = {}, onSubmit, onCancel, loading }) => {
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Description</label>
-        <textarea
-          name="description"
-          value={formData.description || ''}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-          rows="3"
-        />
-      </div>
-
       <div className="flex justify-end space-x-2 pt-4">
         <button
           type="button"

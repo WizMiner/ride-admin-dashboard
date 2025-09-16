@@ -29,6 +29,7 @@ const BaseCrud = ({
   renderStats,
   renderFilters,
   palette,
+  actionLoading,
 }) => {
   return (
     <div className="space-y-6">
@@ -115,7 +116,16 @@ const BaseCrud = ({
       />
 
       {/* Edit/Add Modal */}
-      <Modal isOpen={isModalOpen} onClose={onModalClose} title={modalTitle}>
+      {/* <Modal isOpen={isModalOpen} onClose={onModalClose} title={modalTitle}>
+        {renderForm && renderForm()}
+      </Modal> */}
+      {/* Edit/Add Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={onModalClose}
+        title={modalTitle}
+        palette={palette}
+      >
         {renderForm && renderForm()}
       </Modal>
 
@@ -127,6 +137,7 @@ const BaseCrud = ({
         title="Confirm Delete"
         message={`Are you sure you want to delete ${entityToDelete?.name}? This action cannot be undone.`}
         confirmText="Delete"
+        loading={actionLoading}
         cancelText="Cancel"
       />
     </div>

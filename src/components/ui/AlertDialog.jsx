@@ -2,6 +2,7 @@
 import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import { cn } from '../../common/utils';
+import Spinner from './Spinner';
 
 const AlertDialog = ({
   isOpen,
@@ -11,6 +12,7 @@ const AlertDialog = ({
   onConfirm,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
+  loading,
 }) => {
   if (!isOpen) return null;
 
@@ -29,6 +31,7 @@ const AlertDialog = ({
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
+            disabled={loading}
             className={cn(
               'px-4 py-2 rounded-md border',
               'border-theme',
@@ -41,12 +44,15 @@ const AlertDialog = ({
           </button>
           <button
             onClick={onConfirm}
+            disabled={loading}
             className={cn(
               'px-4 py-2 rounded-md',
               'bg-red-500 text-white',
-              'hover:bg-red-600'
+              'hover:bg-red-600',
+              'flex items-center justify-center'
             )}
           >
+            {loading && <Spinner size="small" className="mr-2" />}
             {confirmText}
           </button>
         </div>

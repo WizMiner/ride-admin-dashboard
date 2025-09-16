@@ -7,12 +7,14 @@ import BaseCrud from '../../components/crud/BaseCrud';
 import DriverForm from './DriverForm';
 import useCrud from '../../hooks/useCrud';
 import { driverApi } from '../../services/driverApi';
+import { useToast } from '../../hooks/useToast';
 
 const Drivers = () => {
   const { currentTheme } = useTheme();
   const palette = getPalette(currentTheme);
 
   const crud = useCrud(driverApi);
+  const { addToast } = useToast();
 
   // Stats
   const totalDrivers = crud.data.length;
@@ -165,6 +167,27 @@ const Drivers = () => {
     </>
   );
 
+  const handleSaveWithToast = async (entity) => {
+    try {
+      await crud.handleSave(entity);
+      const message = `Driver rule ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`;
+      addToast(message, 'success');
+    } catch (err) {
+      const errorMessage = err?.message || 'An unexpected error occurred.';
+      addToast(errorMessage, 'error');
+    }
+  };
+
+  const handleDeleteWithToast = async () => {
+    try {
+      await crud.handleDeleteConfirm();
+      addToast('Driver rule deleted successfully!', 'success');
+    } catch (err) {
+      const errorMessage = err?.message || 'An unexpected error occurred.';
+      addToast(errorMessage, 'error');
+    }
+  };
+
   const renderFilters = () => (
     <select
       value={crud.filters.status}
@@ -200,7 +223,7 @@ const Drivers = () => {
       onModalClose={crud.handleCloseModal}
       isAlertOpen={crud.isAlertOpen}
       onAlertClose={crud.handleCloseAlert}
-      onAlertConfirm={crud.handleDeleteConfirm}
+      onAlertConfirm={handleDeleteWithToast}
       entityToDelete={crud.entityToDelete}
       modalTitle={crud.mode === 'edit' ? 'Edit Driver' : 'Add Driver'}
       renderStats={renderStats}
@@ -208,7 +231,7 @@ const Drivers = () => {
       renderForm={() => (
         <DriverForm
           initialData={crud.selectedEntity}
-          onSubmit={crud.handleSave}
+          onSubmit={handleSaveWithToast}
           onCancel={crud.handleCloseModal}
           loading={crud.actionLoading}
         />

@@ -5,7 +5,6 @@ import {
   User,
   Car,
   MapPin,
-  DollarSign,
   Clock,
   CheckCircle,
   XCircle,

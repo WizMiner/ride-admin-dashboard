@@ -36,6 +36,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     dashboard: true,
     management: true,
     analytics: true,
+    Bookings: true,
     system: true,
   });
 

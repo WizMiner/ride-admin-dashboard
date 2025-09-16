@@ -6,10 +6,10 @@ const PermissionViewModal = ({ open, onClose, permission }) => {
   return (
     <Modal open={open} onClose={onClose} title="Permission Details">
       <div className="space-y-4">
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-gray-700">ID</label>
           <p className="mt-1 text-sm text-gray-900">{permission.id}</p>
-        </div>
+        </div> */}
 
         <div>
           <label className="block text-sm font-medium text-gray-700">

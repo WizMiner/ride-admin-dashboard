@@ -50,7 +50,7 @@ const AdminViewModal = ({ isOpen, onClose, admin }) => {
               <h3 className={cn('text-lg font-semibold', palette.text)}>
                 {admin.fullName}
               </h3>
-              <p className={cn('text-sm', palette.mutedText)}>ID: {admin.id}</p>
+              {/* <p className={cn('text-sm', palette.mutedText)}>ID: {admin.id}</p> */}
               <p className={cn('text-sm', palette.mutedText)}>
                 Username: {admin.username}
               </p>

@@ -1,4 +1,4 @@
-// src/pages/pricing/PricingForm.jsx
+// File: src/pages/pricing/PricingForm.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { cn } from '../../common/utils';
 import Spinner from '../../components/ui/Spinner';
@@ -10,8 +10,8 @@ const PricingForm = ({
   loading,
   palette,
 }) => {
-  // Memoize initial data to avoid useEffect infinite loops
   const safeInitialData = useMemo(() => initialData || {}, [initialData]);
+  const isUpdate = !!safeInitialData?._id;
 
   const [formData, setFormData] = useState({
     vehicleType: safeInitialData.vehicleType || '',
@@ -23,7 +23,6 @@ const PricingForm = ({
   });
 
   useEffect(() => {
-    // Reset form when initialData changes
     setFormData({
       vehicleType: safeInitialData.vehicleType || '',
       baseFare: safeInitialData.baseFare || 0,
@@ -38,31 +37,35 @@ const PricingForm = ({
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'vehicleType' ? value : parseFloat(value) || 0,
+      [name]: [
+        'baseFare',
+        'perKm',
+        'perMinute',
+        'waitingPerMinute',
+        'surgeMultiplier',
+      ].includes(name)
+        ? parseFloat(value) || 0
+        : value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Build payload
     const payload = { ...formData };
-
-    if (safeInitialData?._id) {
+    if (isUpdate) {
       payload._id = safeInitialData._id;
     }
-
     onSubmit(payload);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Vehicle Type Dropdown */}
       <div>
         <label className={cn('block text-sm font-medium mb-1', palette.text)}>
           Vehicle Type
         </label>
-        <input
-          type="text"
+        <select
           name="vehicleType"
           value={formData.vehicleType}
           onChange={handleChange}
@@ -73,9 +76,15 @@ const PricingForm = ({
             palette.text
           )}
           required
-        />
+        >
+          <option value="">Select a vehicle type</option>
+          <option value="mini">Mini</option>
+          <option value="sedan">Sedan</option>
+          <option value="van">Van</option>
+        </select>
       </div>
 
+      {/* Base Fare */}
       <div>
         <label className={cn('block text-sm font-medium mb-1', palette.text)}>
           Base Fare
@@ -96,6 +105,7 @@ const PricingForm = ({
         />
       </div>
 
+      {/* Per KM */}
       <div>
         <label className={cn('block text-sm font-medium mb-1', palette.text)}>
           Per KM
@@ -116,6 +126,7 @@ const PricingForm = ({
         />
       </div>
 
+      {/* Per Minute */}
       <div>
         <label className={cn('block text-sm font-medium mb-1', palette.text)}>
           Per Minute
@@ -136,6 +147,7 @@ const PricingForm = ({
         />
       </div>
 
+      {/* Waiting Per Minute */}
       <div>
         <label className={cn('block text-sm font-medium mb-1', palette.text)}>
           Waiting Per Minute
@@ -156,6 +168,7 @@ const PricingForm = ({
         />
       </div>
 
+      {/* Surge Multiplier */}
       <div>
         <label className={cn('block text-sm font-medium mb-1', palette.text)}>
           Surge Multiplier
@@ -199,7 +212,7 @@ const PricingForm = ({
           )}
         >
           {loading && <Spinner size="small" className="mr-2" />}
-          {loading ? 'Saving...' : safeInitialData._id ? 'Update' : 'Create'}
+          {loading ? 'Saving...' : isUpdate ? 'Update' : 'Create'}
         </button>
       </div>
     </form>

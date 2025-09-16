@@ -8,12 +8,14 @@ import StaffForm from './StaffForm.jsx';
 import useCrud from '../../hooks/useCrud.js';
 import { staffApi } from '../../services/staffApi.js';
 import StaffViewModal from './StaffViewModal.jsx';
+import { useToast } from '../../hooks/useToast.jsx';
 
 const Staffs = () => {
   const { currentTheme } = useTheme();
   const palette = getPalette(currentTheme);
 
   const crud = useCrud(staffApi);
+  const { addToast } = useToast();
 
   // Stats
   const totalStaff = crud.data.length;
@@ -164,6 +166,27 @@ const Staffs = () => {
     </select>
   );
 
+  const handleSaveWithToast = async (entity) => {
+    try {
+      await crud.handleSave(entity);
+      const message = `Staff rule ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`;
+      addToast(message, 'success');
+    } catch (err) {
+      const errorMessage = err?.message || 'An unexpected error occurred.';
+      addToast(errorMessage, 'error');
+    }
+  };
+
+  const handleDeleteWithToast = async () => {
+    try {
+      await crud.handleDeleteConfirm();
+      addToast('Staff rule deleted successfully!', 'success');
+    } catch (err) {
+      const errorMessage = err?.message || 'An unexpected error occurred.';
+      addToast(errorMessage, 'error');
+    }
+  };
+
   return (
     <>
       <BaseCrud
@@ -182,15 +205,16 @@ const Staffs = () => {
         onModalClose={crud.handleCloseModal}
         isAlertOpen={crud.isAlertOpen}
         onAlertClose={crud.handleCloseAlert}
-        onAlertConfirm={crud.handleDeleteConfirm}
+        onAlertConfirm={handleDeleteWithToast}
         entityToDelete={crud.entityToDelete}
+        actionLoading={crud.actionLoading}
         modalTitle={crud.mode === 'edit' ? 'Edit Staff' : 'Add Staff'}
         renderStats={renderStats}
         renderFilters={renderFilters}
         renderForm={() => (
           <StaffForm
             initialData={crud.selectedEntity}
-            onSubmit={crud.handleSave}
+            onSubmit={handleSaveWithToast}
             onCancel={crud.handleCloseModal}
             loading={crud.actionLoading}
             palette={palette}
