@@ -3,39 +3,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { cn } from '../../common/utils';
 import Spinner from '../../components/ui/Spinner';
 
-// Mock permissions data - in a real app, you'd fetch this from an API
-const PERMISSIONS = [
-  { id: 1, name: 'role:create', category: 'Roles' },
-  { id: 2, name: 'role:read', category: 'Roles' },
-  { id: 3, name: 'role:update', category: 'Roles' },
-  { id: 4, name: 'role:delete', category: 'Roles' },
-  { id: 5, name: 'permission:create', category: 'Permissions' },
-  { id: 6, name: 'permission:read', category: 'Permissions' },
-  { id: 7, name: 'permission:update', category: 'Permissions' },
-  { id: 8, name: 'permission:delete', category: 'Permissions' },
-  { id: 9, name: 'user:read', category: 'Users' },
-  { id: 10, name: 'user:update', category: 'Users' },
-  { id: 11, name: 'admin:create', category: 'Admins' },
-  { id: 12, name: 'admin:read', category: 'Admins' },
-  { id: 13, name: 'admin:update', category: 'Admins' },
-  { id: 14, name: 'admin:delete', category: 'Admins' },
-  { id: 15, name: 'driver:approve', category: 'Drivers' },
-  { id: 16, name: 'driver:create', category: 'Drivers' },
-  { id: 17, name: 'driver:read', category: 'Drivers' },
-  { id: 18, name: 'driver:update', category: 'Drivers' },
-  { id: 19, name: 'driver:delete', category: 'Drivers' },
-  { id: 20, name: 'driver:documents:update', category: 'Drivers' },
-  { id: 21, name: 'driver:documents:approve', category: 'Drivers' },
-  { id: 22, name: 'passenger:read', category: 'Passengers' },
-  { id: 23, name: 'passenger:update', category: 'Passengers' },
-  { id: 24, name: 'passenger:delete', category: 'Passengers' },
-  { id: 25, name: 'staff:create', category: 'Staff' },
-  { id: 26, name: 'staff:read', category: 'Staff' },
-  { id: 27, name: 'staff:update', category: 'Staff' },
-  { id: 28, name: 'staff:delete', category: 'Staff' },
-  { id: 32, name: 'role:create', category: 'Roles' },
-];
-
 const StaffForm = ({
   initialData = {},
   onSubmit,
@@ -49,11 +16,11 @@ const StaffForm = ({
   const [formData, setFormData] = useState({
     fullName: '',
     username: '',
-    password: '',
     roleId: '',
     department: '',
     status: true,
     ...safeInitialData,
+    password: '',
   });
 
   useEffect(() => {
@@ -61,11 +28,11 @@ const StaffForm = ({
     setFormData({
       fullName: '',
       username: '',
-      password: '',
       roleId: '',
       department: '',
       status: true,
       ...safeInitialData,
+      password: '',
     });
   }, [safeInitialData]);
 
@@ -90,9 +57,9 @@ const StaffForm = ({
     };
 
     if (safeInitialData?.id) {
-      // Update: include password only if user entered a new one
-      if (formData.password) payload.password = formData.password;
-      // Include id for update
+      if (formData.password) {
+        payload.password = formData.password;
+      }
       payload.id = safeInitialData.id;
     } else {
       // Create: must include password
@@ -185,7 +152,7 @@ const StaffForm = ({
 
       <div>
         <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-          Role ID
+          Role
         </label>
         <select
           name="roleId"
@@ -205,25 +172,6 @@ const StaffForm = ({
           <option value="3">Support Staff</option>
           <option value="4">HR</option>
         </select>
-      </div>
-
-      <div>
-        <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-          Department
-        </label>
-        <input
-          type="text"
-          name="department"
-          value={formData.department || ''}
-          onChange={handleChange}
-          className={cn(
-            'w-full p-2 border rounded',
-            palette.border,
-            palette.card,
-            palette.text
-          )}
-          required
-        />
       </div>
 
       <div className="flex items-center">

@@ -1,6 +1,24 @@
 // src/hooks/useCrud.jsx
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
+const deepSearch = (obj, query) => {
+  if (!obj) return false;
+
+  if (typeof obj === 'string' || typeof obj === 'number') {
+    return obj.toString().toLowerCase().includes(query.toLowerCase());
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.some((el) => deepSearch(el, query));
+  }
+
+  if (typeof obj === 'object') {
+    return Object.values(obj).some((val) => deepSearch(val, query));
+  }
+
+  return false;
+};
+
 const useCrud = (api, initialFilters = {}) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,15 +55,8 @@ const useCrud = (api, initialFilters = {}) => {
 
     let filtered = [...data];
 
-    // Search
     if (searchQuery) {
-      filtered = filtered.filter((item) =>
-        Object.values(item).some(
-          (value) =>
-            value &&
-            value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      );
+      filtered = filtered.filter((item) => deepSearch(item, searchQuery));
     }
 
     Object.entries(filters).forEach(([key, value]) => {

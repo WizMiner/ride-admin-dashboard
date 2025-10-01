@@ -8,6 +8,7 @@ import DriverForm from './DriverForm';
 import useCrud from '../../hooks/useCrud';
 import { driverApi } from '../../services/driverApi';
 import { useToast } from '../../hooks/useToast';
+import DriverViewModal from './DriverViewModal.jsx';
 
 const Drivers = () => {
   const { currentTheme } = useTheme();
@@ -17,10 +18,19 @@ const Drivers = () => {
   const { addToast } = useToast();
 
   // Stats
-  const totalDrivers = crud.data.length;
-  const onlineDrivers = crud.data.filter((d) => d.status === 'online').length;
-  const busyDrivers = crud.data.filter((d) => d.status === 'busy').length;
-  const offlineDrivers = crud.data.filter((d) => d.status === 'offline').length;
+  const totalDrivers = crud.filteredData.length;
+  const onlineDrivers = crud.filteredData.filter(
+    (d) => d.status === 'online'
+  ).length;
+  // const busyDrivers = crud.filteredData.filter(
+  //   (d) => d.status === 'busy'
+  // ).length;
+  const offlineDrivers = crud.filteredData.filter(
+    (d) => d.status === 'offline'
+  ).length;
+  const pending = crud.filteredData.filter(
+    (d) => d.status === 'pending'
+  ).length;
 
   // Columns
   const columns = [
@@ -47,7 +57,6 @@ const Drivers = () => {
             <p className={cn('font-medium', palette.text)}>
               {item.name || 'Unknown'}
             </p>
-            {/* <p className={cn('text-sm', palette.mutedText)}>ID: {item.id}</p> */}
           </div>
         </div>
       ),
@@ -131,8 +140,9 @@ const Drivers = () => {
       {[
         { label: 'Total Drivers', value: totalDrivers, color: 'primary' },
         { label: 'Online', value: onlineDrivers, color: 'green' },
-        { label: 'Busy', value: busyDrivers, color: 'yellow' },
+        // { label: 'Busy', value: busyDrivers, color: 'yellow' },
         { label: 'Offline', value: offlineDrivers, color: 'gray' },
+        { label: 'Pending', value: pending, color: 'yellow' },
       ].map((stat, idx) => (
         <div
           key={idx}
@@ -170,7 +180,7 @@ const Drivers = () => {
   const handleSaveWithToast = async (entity) => {
     try {
       await crud.handleSave(entity);
-      const message = `Driver rule ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`;
+      const message = `Driver ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`;
       addToast(message, 'success');
     } catch (err) {
       const errorMessage = err?.message || 'An unexpected error occurred.';
@@ -181,7 +191,7 @@ const Drivers = () => {
   const handleDeleteWithToast = async () => {
     try {
       await crud.handleDeleteConfirm();
-      addToast('Driver rule deleted successfully!', 'success');
+      addToast('Driver deleted successfully!', 'success');
     } catch (err) {
       const errorMessage = err?.message || 'An unexpected error occurred.';
       addToast(errorMessage, 'error');
@@ -201,43 +211,54 @@ const Drivers = () => {
     >
       <option value="all">All Status</option>
       <option value="online">Online</option>
+      <option value="pending">Pending</option>
       <option value="busy">Busy</option>
       <option value="offline">Offline</option>
     </select>
   );
 
   return (
-    <BaseCrud
-      title="Drivers"
-      description="Manage driver accounts and monitor their status"
-      columns={columns}
-      filteredData={crud.filteredData}
-      isLoading={crud.isLoading}
-      searchQuery={crud.searchQuery}
-      onSearchChange={(e) => crud.handleSearch(e.target.value)}
-      onAdd={crud.handleAdd}
-      onEdit={crud.handleEdit}
-      onView={crud.handleView}
-      onDelete={crud.handleDelete}
-      isModalOpen={crud.isModalOpen}
-      onModalClose={crud.handleCloseModal}
-      isAlertOpen={crud.isAlertOpen}
-      onAlertClose={crud.handleCloseAlert}
-      onAlertConfirm={handleDeleteWithToast}
-      entityToDelete={crud.entityToDelete}
-      modalTitle={crud.mode === 'edit' ? 'Edit Driver' : 'Add Driver'}
-      renderStats={renderStats}
-      renderFilters={renderFilters}
-      renderForm={() => (
-        <DriverForm
-          initialData={crud.selectedEntity}
-          onSubmit={handleSaveWithToast}
-          onCancel={crud.handleCloseModal}
-          loading={crud.actionLoading}
-        />
-      )}
-      palette={palette}
-    />
+    <>
+      <BaseCrud
+        title="Drivers"
+        description="Manage driver accounts and monitor their status"
+        columns={columns}
+        filteredData={crud.filteredData}
+        isLoading={crud.isLoading}
+        searchQuery={crud.searchQuery}
+        onSearchChange={(e) => crud.handleSearch(e.target.value)}
+        onAdd={crud.handleAdd}
+        allowAdd={false}
+        onEdit={crud.handleEdit}
+        onView={crud.handleView}
+        onDelete={crud.handleDelete}
+        isModalOpen={crud.isModalOpen && crud.mode !== 'view'}
+        onModalClose={crud.handleCloseModal}
+        isAlertOpen={crud.isAlertOpen}
+        onAlertClose={crud.handleCloseAlert}
+        onAlertConfirm={handleDeleteWithToast}
+        entityToDelete={crud.entityToDelete}
+        modalTitle={crud.mode === 'edit' ? 'Edit Driver' : 'Add Driver'}
+        renderStats={renderStats}
+        renderFilters={renderFilters}
+        renderForm={() => (
+          <DriverForm
+            initialData={crud.selectedEntity}
+            onSubmit={handleSaveWithToast}
+            onCancel={crud.handleCloseModal}
+            loading={crud.actionLoading}
+          />
+        )}
+        palette={palette}
+      />
+
+      {/* FIX: Add the separate view modal component */}
+      <DriverViewModal
+        isOpen={crud.mode === 'view' && crud.isModalOpen}
+        onClose={crud.handleCloseModal}
+        driver={crud.selectedEntity}
+      />
+    </>
   );
 };
 

@@ -1,4 +1,4 @@
-// src/pages/booking/Bookings.jsx
+// File: src/pages/booking/Bookings.jsx
 import React from 'react';
 import { useTheme } from '../../hooks/useTheme.jsx';
 import { getPalette } from '../../common/themes.js';
@@ -34,18 +34,52 @@ const Bookings = () => {
 
   // Columns
   const columns = [
-    // {
-    //   key: '_id',
-    //   title: 'ID',
-    //   render: (item) => (
-    //     <p className={cn('font-medium', palette.text)}>{item._id}</p>
-    //   ),
-    // },
     {
-      key: 'passengerId',
-      title: 'Passenger ID',
+      key: 'passenger.name',
+      title: 'Passenger Name',
       render: (item) => (
-        <p className={cn('text-sm', palette.text)}>{item.passengerId}</p>
+        <div className="flex items-center gap-3">
+          <div
+            className={cn(
+              'w-10 h-10 rounded-full flex items-center justify-center',
+              palette.avatarBg,
+              'text-white font-semibold'
+            )}
+          >
+            <span className="text-sm">
+              {item.passenger?.name
+                ?.split(' ')
+                .map((n) => n[0])
+                .join('') || 'P'}
+            </span>
+          </div>
+          <div>
+            <p className={cn('font-medium', palette.text)}>
+              {item.passenger?.name || 'Unknown'}
+            </p>
+            <p className={cn('text-sm', palette.mutedText)}>
+              {item.passenger?.phone || 'No phone'}
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'pickup.address',
+      title: 'Pickup Address',
+      render: (item) => (
+        <p className={cn('text-sm', palette.text)}>
+          {item.pickup?.address || 'N/A'}
+        </p>
+      ),
+    },
+    {
+      key: 'dropoff.address',
+      title: 'Dropoff Address',
+      render: (item) => (
+        <p className={cn('text-sm', palette.text)}>
+          {item.dropoff?.address || 'N/A'}
+        </p>
       ),
     },
     {
@@ -95,15 +129,6 @@ const Bookings = () => {
         </p>
       ),
     },
-    // {
-    //   key: 'createdAt',
-    //   title: 'Created At',
-    //   render: (item) => (
-    //     <p className={cn('text-sm', palette.mutedText)}>
-    //       {new Date(item.createdAt).toLocaleString()}
-    //     </p>
-    //   ),
-    // },
   ];
 
   const renderStats = () => (

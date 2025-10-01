@@ -67,7 +67,9 @@ export const AuthProvider = ({ children }) => {
     try {
       // choose endpoint
       const endpoint =
-        userType === 'staff' ? '/auth/staff/login' : '/auth/admin/login';
+        userType === 'staff'
+          ? '/api/auth/staff/login'
+          : '/api/auth/admin/login';
       const { data } = await api.post(endpoint, { username, password });
 
       if (data.token) {

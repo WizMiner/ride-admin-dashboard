@@ -1,9 +1,9 @@
 import api from './auth';
 
 export const roleApi = {
-  list: () => api.get('/roles'),
-  get: (id) => api.get(`/roles/${id}`),
-  create: (data) => api.post('/roles', data),
-  update: (id, data) => api.put(`/roles/${id}`, data),
-  delete: (id) => api.delete(`/roles/${id}`),
+  list: () => api.get('/api/roles'),
+  get: (id) => api.get(`/api/roles/${id}`),
+  create: (data) => api.post('/api/roles', data),
+  update: (id, data) => api.put(`/api/roles/${id}`, data),
+  delete: (id) => api.delete(`/api/roles/${id}`),
 };

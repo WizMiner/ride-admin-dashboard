@@ -19,20 +19,8 @@ const StaffViewModal = ({ isOpen, onClose, staff }) => {
 
   if (!isOpen || !staff) return null;
 
-  const getRoleName = (roleId) => {
-    switch (roleId) {
-      case 1:
-        return 'Administrator';
-      case 2:
-        return 'Manager';
-      case 3:
-        return 'Support Staff';
-      case 4:
-        return 'HR';
-      default:
-        return `Role ${roleId}`;
-    }
-  };
+  const roleName =
+    staff.roles && staff.roles.length > 0 ? staff.roles[0].name : 'No Role';
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -74,7 +62,6 @@ const StaffViewModal = ({ isOpen, onClose, staff }) => {
               <h3 className={cn('text-lg font-semibold', palette.text)}>
                 {staff.fullName}
               </h3>
-              {/* <p className={cn('text-sm', palette.mutedText)}>ID: {staff.id}</p> */}
               <p className={cn('text-sm', palette.mutedText)}>
                 Username: {staff.username}
               </p>
@@ -89,16 +76,17 @@ const StaffViewModal = ({ isOpen, onClose, staff }) => {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Shield size={16} className={cn(palette.mutedText)} />
+                {/* FIX: Use the roleName variable */}
                 <span className={cn('text-sm', palette.text)}>
-                  Role: {getRoleName(staff.roleId)}
+                  Role: {roleName}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                 <Building size={16} className={cn(palette.mutedText)} />
                 <span className={cn('text-sm', palette.text)}>
                   Department: {staff.department || 'Not specified'}
                 </span>
-              </div>
+              </div> */}
               <div className="flex items-center gap-2">
                 {staff.status ? (
                   <>

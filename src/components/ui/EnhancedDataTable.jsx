@@ -1,7 +1,7 @@
 // File: src/components/ui/EnhancedDataTable.jsx
 import React, { useState, useMemo } from 'react';
 import { Eye, Edit, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
-import { cn } from '../../common/utils';
+import { cn, getValue } from '../../common/utils';
 import { useTheme } from '../../hooks/useTheme.jsx';
 import { getPalette } from '../../common/themes';
 
@@ -18,24 +18,26 @@ const EnhancedDataTable = ({
   const { currentTheme } = useTheme();
   const palette = getPalette(currentTheme);
 
-  // 🔹 Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(defaultPageSize);
 
-  // 🔹 Sorting state
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
   // 🔹 Sorting logic
   const sortedData = useMemo(() => {
     if (!sortConfig.key) return data;
+
     return [...data].sort((a, b) => {
-      const valA = a[sortConfig.key];
-      const valB = b[sortConfig.key];
+      const valA = getValue(a, sortConfig.key);
+      const valB = getValue(b, sortConfig.key);
+
       if (valA == null) return 1;
       if (valB == null) return -1;
+
       if (typeof valA === 'number' && typeof valB === 'number') {
         return sortConfig.direction === 'asc' ? valA - valB : valB - valA;
       }
+
       return sortConfig.direction === 'asc'
         ? valA.toString().localeCompare(valB.toString())
         : valB.toString().localeCompare(valA.toString());
@@ -61,12 +63,7 @@ const EnhancedDataTable = ({
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div
-          className={cn(
-            'animate-spin rounded-full h-12 w-12 border-b-2',
-            'border-primary-500'
-          )}
-        ></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
       </div>
     );
   }
@@ -138,7 +135,10 @@ const EnhancedDataTable = ({
               >
                 {columns.map((column) => (
                   <td key={column.key} className="p-4">
-                    {column.render ? column.render(item) : item[column.key]}
+                    {/* ⬇️ fallback: use getValue so nested keys also display */}
+                    {column.render
+                      ? column.render(item)
+                      : getValue(item, column.key)}
                   </td>
                 ))}
                 <td className="p-4">
@@ -191,7 +191,8 @@ const EnhancedDataTable = ({
       </div>
 
       {/* Pagination controls */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-wrap justify-between items-center gap-4">
+        {/* Rows per page */}
         <div className="flex items-center gap-2">
           <span className={cn('text-sm', palette.mutedText)}>
             Rows per page:
@@ -217,7 +218,8 @@ const EnhancedDataTable = ({
           </select>
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* Page navigation */}
+        <div className="flex items-center gap-2">
           <button
             disabled={currentPage === 1}
             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
@@ -225,9 +227,38 @@ const EnhancedDataTable = ({
           >
             Prev
           </button>
+
           <span className="text-sm">
-            Page {currentPage} of {totalPages}
+            Page{' '}
+            <input
+              type="number"
+              min={1}
+              max={totalPages}
+              value={currentPage}
+              onChange={(e) => {
+                let page = Number(e.target.value);
+                if (page < 1) page = 1;
+                if (page > totalPages) page = totalPages;
+                setCurrentPage(page);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  let page = Number(e.target.value);
+                  if (page < 1) page = 1;
+                  if (page > totalPages) page = totalPages;
+                  setCurrentPage(page);
+                }
+              }}
+              className={cn(
+                'w-16 px-2 py-1 border rounded text-sm text-center',
+                palette.border,
+                palette.card,
+                palette.text
+              )}
+            />{' '}
+            of {totalPages}
           </span>
+
           <button
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}

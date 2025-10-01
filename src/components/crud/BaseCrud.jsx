@@ -15,6 +15,7 @@ const BaseCrud = ({
   searchQuery,
   onSearchChange,
   onAdd,
+  allowAdd = true,
   onEdit,
   onView,
   onDelete,
@@ -39,16 +40,18 @@ const BaseCrud = ({
           <h1 className={cn('text-3xl font-bold', palette.text)}>{title}</h1>
           <p className={cn('mt-1', palette.mutedText)}>{description}</p>
         </div>
-        <button
-          onClick={onAdd}
-          className={cn(
-            'px-4 py-2 rounded-md flex items-center',
-            palette.btnPrimary
-          )}
-        >
-          <Plus size={16} className="mr-2" />
-          Add {title.slice(0, -1)}
-        </button>
+        {allowAdd && (
+          <button
+            onClick={onAdd}
+            className={cn(
+              'px-4 py-2 rounded-md text-white flex items-center justify-center',
+              palette.btnPrimary
+            )}
+          >
+            <Plus size={20} className="mr-2" />
+            Add {title}
+          </button>
+        )}
       </div>
 
       {/* Stats */}

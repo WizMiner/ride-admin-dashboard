@@ -53,25 +53,13 @@ const Staffs = () => {
       ),
     },
     {
-      key: 'department',
-      title: 'Department & Role',
+      key: 'roles',
+      title: 'Role', // Updated title to be more accurate
       render: (item) => (
-        <div>
-          <p className={cn('text-sm font-medium', palette.text)}>
-            {item.department || 'No department'}
-          </p>
-          <p className={cn('text-sm', palette.mutedText)}>
-            {item.roleId === 1
-              ? 'Administrator'
-              : item.roleId === 2
-                ? 'Manager'
-                : item.roleId === 3
-                  ? 'Support Staff'
-                  : item.roleId === 4
-                    ? 'HR'
-                    : `Role ${item.roleId}`}
-          </p>
-        </div>
+        <p className={cn('text-sm font-medium', palette.text)}>
+          {/* Access the name from the roles array. Use a fallback for items with no roles */}
+          {item.roles && item.roles.length > 0 ? item.roles[0].name : 'No Role'}
+        </p>
       ),
     },
     {
@@ -161,15 +149,15 @@ const Staffs = () => {
       )}
     >
       <option value="all">All Status</option>
-      <option value="true">Active</option>
-      <option value="false">Inactive</option>
+      <option value="1">Active</option> {/* Use '1' for the filter value */}
+      <option value="0">Inactive</option> {/* Use '0' for the filter value */}
     </select>
   );
 
   const handleSaveWithToast = async (entity) => {
     try {
       await crud.handleSave(entity);
-      const message = `Staff rule ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`;
+      const message = `Staff ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`;
       addToast(message, 'success');
     } catch (err) {
       const errorMessage = err?.message || 'An unexpected error occurred.';
@@ -180,7 +168,7 @@ const Staffs = () => {
   const handleDeleteWithToast = async () => {
     try {
       await crud.handleDeleteConfirm();
-      addToast('Staff rule deleted successfully!', 'success');
+      addToast('Staff deleted successfully!', 'success');
     } catch (err) {
       const errorMessage = err?.message || 'An unexpected error occurred.';
       addToast(errorMessage, 'error');
