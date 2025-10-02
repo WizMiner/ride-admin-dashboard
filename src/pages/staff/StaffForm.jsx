@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { cn } from '../../common/utils';
 import Spinner from '../../components/ui/Spinner';
+import { roleApi } from '../../services/roleApi';
 
 const StaffForm = ({
   initialData = {},
@@ -10,31 +11,50 @@ const StaffForm = ({
   loading,
   palette,
 }) => {
-  // Memoize initial data to avoid useEffect infinite loops
   const safeInitialData = useMemo(() => initialData || {}, [initialData]);
+
+  const [roles, setRoles] = useState([]);
+  const [loadingRoles, setLoadingRoles] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: '',
     username: '',
-    roleId: '',
+    roleId: safeInitialData?.roles?.[0]?.id || '',
     department: '',
     status: true,
-    ...safeInitialData,
+    salary: '',
+    bankAccountNo: '',
     password: '',
   });
 
   useEffect(() => {
-    // Reset form when initialData changes
     setFormData({
-      fullName: '',
-      username: '',
-      roleId: '',
-      department: '',
-      status: true,
-      ...safeInitialData,
+      fullName: safeInitialData.fullName || '',
+      username: safeInitialData.username || '',
+      roleId: safeInitialData?.roles?.[0]?.id || '',
+      department: safeInitialData.department || '',
+      status: safeInitialData.status === '0' ? false : true,
+      salary: safeInitialData.salary || '',
+      bankAccountNo: safeInitialData.bankAccountNo || '',
       password: '',
     });
   }, [safeInitialData]);
+
+  // Fetch roles dynamically
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        setLoadingRoles(true);
+        const { data } = await roleApi.list();
+        setRoles(data || []);
+      } catch (err) {
+        console.error('Failed to load roles:', err);
+      } finally {
+        setLoadingRoles(false);
+      }
+    };
+    fetchRoles();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -47,22 +67,23 @@ const StaffForm = ({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Build payload depending on create or update
     const payload = {
       fullName: formData.fullName,
       username: formData.username,
-      roleId: parseInt(formData.roleId),
+      roleId: parseInt(formData.roleId, 10),
       department: formData.department,
       status: formData.status,
     };
 
     if (safeInitialData?.id) {
-      if (formData.password) {
-        payload.password = formData.password;
-      }
+      // Update case
+      if (formData.password) payload.password = formData.password;
+      if (formData.salary) payload.salary = Number(formData.salary);
+      if (formData.bankAccountNo)
+        payload.bankAccountNo = formData.bankAccountNo;
       payload.id = safeInitialData.id;
     } else {
-      // Create: must include password
+      // Create case
       payload.password = formData.password;
     }
 
@@ -71,6 +92,7 @@ const StaffForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Full Name */}
       <div>
         <label className={cn('block text-sm font-medium mb-1', palette.text)}>
           Full Name
@@ -90,6 +112,7 @@ const StaffForm = ({
         />
       </div>
 
+      {/* Username */}
       <div>
         <label className={cn('block text-sm font-medium mb-1', palette.text)}>
           Username
@@ -109,7 +132,8 @@ const StaffForm = ({
         />
       </div>
 
-      {!safeInitialData?.id && (
+      {/* Password */}
+      {!safeInitialData?.id ? (
         <div>
           <label className={cn('block text-sm font-medium mb-1', palette.text)}>
             Password
@@ -128,9 +152,7 @@ const StaffForm = ({
             required
           />
         </div>
-      )}
-
-      {safeInitialData?.id && (
+      ) : (
         <div>
           <label className={cn('block text-sm font-medium mb-1', palette.text)}>
             Password (leave empty to keep current)
@@ -150,13 +172,14 @@ const StaffForm = ({
         </div>
       )}
 
+      {/* Role */}
       <div>
         <label className={cn('block text-sm font-medium mb-1', palette.text)}>
           Role
         </label>
         <select
           name="roleId"
-          value={formData.roleId || ''}
+          value={formData.roleId ? String(formData.roleId) : ''}
           onChange={handleChange}
           className={cn(
             'w-full p-2 border rounded',
@@ -167,13 +190,64 @@ const StaffForm = ({
           required
         >
           <option value="">Select Role</option>
-          <option value="1">Administrator</option>
-          <option value="2">Manager</option>
-          <option value="3">Support Staff</option>
-          <option value="4">HR</option>
+          {loadingRoles ? (
+            <option disabled>Loading roles...</option>
+          ) : (
+            roles.map((role) => (
+              <option key={role.id} value={String(role.id)}>
+                {role.name}
+              </option>
+            ))
+          )}
         </select>
       </div>
 
+      {/* Salary & Bank Account (only for update) */}
+      {safeInitialData?.id && (
+        <>
+          <div>
+            <label
+              className={cn('block text-sm font-medium mb-1', palette.text)}
+            >
+              Salary
+            </label>
+            <input
+              type="number"
+              name="salary"
+              value={formData.salary || ''}
+              onChange={handleChange}
+              className={cn(
+                'w-full p-2 border rounded',
+                palette.border,
+                palette.card,
+                palette.text
+              )}
+            />
+          </div>
+
+          <div>
+            <label
+              className={cn('block text-sm font-medium mb-1', palette.text)}
+            >
+              Bank Account No
+            </label>
+            <input
+              type="text"
+              name="bankAccountNo"
+              value={formData.bankAccountNo || ''}
+              onChange={handleChange}
+              className={cn(
+                'w-full p-2 border rounded',
+                palette.border,
+                palette.card,
+                palette.text
+              )}
+            />
+          </div>
+        </>
+      )}
+
+      {/* Status */}
       <div className="flex items-center">
         <input
           type="checkbox"
@@ -191,6 +265,7 @@ const StaffForm = ({
         </label>
       </div>
 
+      {/* Buttons */}
       <div className="flex justify-end space-x-2 pt-4">
         <button
           type="button"

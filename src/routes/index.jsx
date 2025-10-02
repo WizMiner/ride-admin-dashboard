@@ -1,4 +1,3 @@
-//src/routes/index.jsx
 import { createBrowserRouter } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import Layout from '../components/layout/Layout.jsx';
@@ -20,8 +19,8 @@ import Settings from '../pages/Settings.jsx';
 import Security from '../pages/Security.jsx';
 import Help from '../pages/Help.jsx';
 
-import Bookings from '../pages/booking/Bookings';
-import Trips from '../pages/trip/Trips';
+import Bookings from '../pages/booking/Bookings.jsx';
+import Trips from '../pages/trip/Trips.jsx';
 import Pricing from '../pages/pricing/Pricing.jsx';
 import Live from '../pages/live/Live.jsx';
 
@@ -61,7 +60,6 @@ export const router = createBrowserRouter([
       {
         path: 'passengers',
         element: (
-          // <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
           <ProtectedRoute>
             <Passengers />
           </ProtectedRoute>
@@ -174,7 +172,7 @@ export const router = createBrowserRouter([
       {
         path: 'settings',
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requireSuperAdmin>
             <Settings />
           </ProtectedRoute>
         ),

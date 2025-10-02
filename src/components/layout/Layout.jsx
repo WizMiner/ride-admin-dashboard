@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar.jsx';
 import Sidebar from './Sidebar.jsx';
-// import { useTheme } from '../../hooks/useTheme.jsx';
+import ErrorBoundary from '../ui/ErrorBoundary.jsx';
 import { cn } from '../../common/utils';
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  // const { currentTheme } = useTheme();
+  const location = useLocation();
 
   const toggleSidebar = () => setIsSidebarOpen((v) => !v);
   const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
-    // top-level uses CSS-variable-driven utilities so background/text follow theme
     <div
       className={cn(
         'min-h-screen transition-colors duration-300',
@@ -26,9 +25,11 @@ const Layout = () => {
       <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
 
       <main className="min-h-screen transition-all duration-300 lg:ml-64">
-        {/* content container uses card/bg utilities so it flips in dark mode */}
         <div className={cn('p-6 mt-16', 'bg-theme', 'text-theme')}>
-          <Outlet />
+          {/* Wrap Outlet with ErrorBoundary keyed to location.pathname */}
+          <ErrorBoundary key={location.pathname}>
+            <Outlet />
+          </ErrorBoundary>
         </div>
       </main>
     </div>

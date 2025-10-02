@@ -19,7 +19,8 @@ const deepSearch = (obj, query) => {
   return false;
 };
 
-const useCrud = (api, initialFilters = {}) => {
+const useCrud = (api, initialFilters = {}, options = {}) => {
+  const { transformData } = options;
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,21 +35,25 @@ const useCrud = (api, initialFilters = {}) => {
   // Helper: get correct ID field (id or _id)
   const getEntityId = (entity) => entity?.id || entity?._id;
 
-  // Load data from API
   const loadData = useCallback(async () => {
+    setData([]);
     setIsLoading(true);
     try {
       const response = await api.list(filters);
-      // Ensure data is always an array
-      const list = Array.isArray(response) ? response : response?.data || [];
-      setData(list);
+      let list = [];
+      if (transformData) {
+        list = transformData(response.data);
+      } else {
+        list = Array.isArray(response) ? response : response?.data || [];
+      }
+      setData(Array.isArray(list) ? list : []);
     } catch (error) {
       console.error('Error loading data:', error);
       setData([]);
     } finally {
       setIsLoading(false);
     }
-  }, [api, filters]);
+  }, [api, filters, transformData]);
 
   const filteredData = useMemo(() => {
     if (!Array.isArray(data)) return [];
@@ -69,6 +74,7 @@ const useCrud = (api, initialFilters = {}) => {
   }, [data, searchQuery, filters]);
 
   useEffect(() => {
+    // console.log('useEffect triggered. Calling loadData...');
     loadData();
   }, [loadData]);
 

@@ -1,128 +1,106 @@
-// File: src/pages/AdminForm.jsx
+// File: src/pages/DriverForm.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { cn } from '../../common/utils';
 import Spinner from '../../components/ui/Spinner';
+import { useTheme } from '../../hooks/useTheme.jsx';
+import { getPalette } from '../../common/themes.js';
 
-const AdminForm = ({ initialData = {}, onSubmit, onCancel, loading }) => {
-  // Memoize initial data to avoid useEffect infinite loops
+const DriverForm = ({ initialData = {}, onSubmit, onCancel, loading }) => {
+  const { currentTheme } = useTheme();
+  const palette = getPalette(currentTheme);
+
   const safeInitialData = useMemo(() => initialData || {}, [initialData]);
 
-  const [formData, setFormData] = useState({
-    fullName: '',
-    username: '',
-    password: '',
-    email: '',
-    ...safeInitialData,
-  });
+  const [status, setStatus] = useState(safeInitialData.status || 'pending');
 
   useEffect(() => {
-    // Reset form when initialData changes
-    setFormData({ ...safeInitialData, password: '' });
+    setStatus(safeInitialData.status || 'pending');
   }, [safeInitialData]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setStatus(e.target.value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Build payload depending on create or update
-    const payload = {
-      fullName: formData.fullName,
-      username: formData.username,
-    };
-
-    if (safeInitialData?.id) {
-      // Update: include email if present
-      if (formData.email) payload.email = formData.email;
-      // Include password only if user entered a new one
-      if (formData.password) payload.password = formData.password;
-      // Include id for update
-      payload.id = safeInitialData.id;
-    } else {
-      // Create: must include password
-      payload.password = formData.password;
-    }
-
-    onSubmit(payload);
+    onSubmit({ id: safeInitialData.id, status });
   };
 
+  const statusOptions = ['pending', 'approved', 'suspended', 'rejected'];
+
+  const statusStyleMap = useMemo(() => {
+    return {
+      pending: {
+        bg: 'bg-yellow-100',
+        text: 'text-yellow-700',
+        border: 'border-yellow-400',
+      },
+      approved: {
+        bg: 'bg-green-100',
+        text: 'text-green-700',
+        border: 'border-green-400',
+      },
+      suspended: {
+        bg: 'bg-orange-100',
+        text: 'text-orange-700',
+        border: 'border-orange-400',
+      },
+      rejected: {
+        bg: 'bg-red-100',
+        text: 'text-red-700',
+        border: 'border-red-400',
+      },
+    };
+  }, []);
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-sm font-medium mb-1">Full Name</label>
-        <input
-          type="text"
-          name="fullName"
-          value={formData.fullName || ''}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-          required
-        />
+        <label className={cn('block text-sm font-medium mb-2', palette.text)}>
+          Driver Status
+        </label>
+        <div className="grid grid-cols-2 gap-4">
+          {statusOptions.map((option) => {
+            const isSelected = status === option;
+            const style = statusStyleMap[option];
+
+            return (
+              <label
+                key={option}
+                className={cn(
+                  'flex items-center p-3 border rounded-lg cursor-pointer transition-all duration-200 transform hover:scale-105',
+                  isSelected
+                    ? `${style.bg} ${style.border} border-2`
+                    : cn('border-gray-300 hover:border-blue-400', palette.card)
+                )}
+              >
+                <input
+                  type="radio"
+                  name="status"
+                  value={option}
+                  checked={isSelected}
+                  onChange={handleChange}
+                  className="mr-2 accent-blue-500"
+                />
+                <span className={cn('capitalize font-medium', palette.text)}>
+                  {option}
+                </span>
+              </label>
+            );
+          })}
+        </div>
       </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-1">Username</label>
-        <input
-          type="text"
-          name="username"
-          value={formData.username || ''}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-          required
-        />
-      </div>
-
-      {safeInitialData?.id && (
-        <div>
-          <label className="block text-sm font-medium mb-1">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email || ''}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-      )}
-
-      {!safeInitialData?.id && (
-        <div>
-          <label className="block text-sm font-medium mb-1">Password</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password || ''}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-      )}
-
-      {safeInitialData?.id && (
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Password (leave empty to keep current)
-          </label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password || ''}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-      )}
 
       <div className="flex justify-end space-x-2 pt-4">
         <button
           type="button"
           onClick={onCancel}
           className={cn(
-            'px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+            'px-4 py-2 rounded-md border',
+            palette.border,
+            palette.card,
+            palette.text,
+            palette.hover
           )}
         >
           Cancel
@@ -130,14 +108,17 @@ const AdminForm = ({ initialData = {}, onSubmit, onCancel, loading }) => {
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 rounded-md bg-blue-600 text-white flex items-center justify-center"
+          className={cn(
+            'px-4 py-2 rounded-md text-white flex items-center justify-center',
+            palette.btnPrimary
+          )}
         >
           {loading && <Spinner size="small" className="mr-2" />}
-          {loading ? 'Saving...' : safeInitialData.id ? 'Update' : 'Create'}
+          {loading ? 'Saving...' : 'Update Status'}
         </button>
       </div>
     </form>
   );
 };
 
-export default AdminForm;
+export default DriverForm;

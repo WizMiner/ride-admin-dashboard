@@ -47,14 +47,14 @@ const PassengerViewModal = ({ isOpen, onClose, passenger }) => {
                 .map((n) => n[0])
                 .join('')}
             </div>
-            <div>
+            {/* <div>
               <h3 className={cn('text-lg font-semibold', palette.text)}>
                 {passenger.name}
               </h3>
               <p className={cn('text-sm', palette.mutedText)}>
                 ID: {passenger.id}
               </p>
-            </div>
+            </div> */}
           </div>
 
           {/* Contact Information */}

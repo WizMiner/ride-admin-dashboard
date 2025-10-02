@@ -201,6 +201,7 @@ const Pricing = () => {
         isOpen={crud.mode === 'view' && crud.isModalOpen}
         onClose={crud.handleCloseModal}
         pricing={crud.selectedEntity}
+        palette={palette}
       />
     </>
   );

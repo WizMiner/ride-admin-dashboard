@@ -306,7 +306,6 @@ const Passengers = () => {
         searchQuery={crud.searchQuery}
         onSearchChange={(e) => crud.handleSearch(e.target.value)}
         onAdd={crud.handleAdd}
-        allowAdd={false}
         onEdit={crud.handleEdit}
         onView={crud.handleView}
         onDelete={crud.handleDelete}
