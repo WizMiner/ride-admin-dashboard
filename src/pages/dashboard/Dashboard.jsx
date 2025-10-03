@@ -22,7 +22,7 @@ const Dashboard = () => {
 
   const stats = [
     {
-      title: 'Total Users',
+      title: 'Total Users Type',
       value: isLoadingData
         ? '...'
         : overview?.totalUsers?.toLocaleString() || '0',

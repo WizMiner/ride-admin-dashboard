@@ -47,6 +47,7 @@ const useCrud = (api, initialFilters = {}, options = {}) => {
         list = Array.isArray(response) ? response : response?.data || [];
       }
       setData(Array.isArray(list) ? list : []);
+      // console.log('Data loaded:', list);
     } catch (error) {
       console.error('Error loading data:', error);
       setData([]);
@@ -70,6 +71,7 @@ const useCrud = (api, initialFilters = {}, options = {}) => {
       }
     });
 
+    // console.log('Filtered data for table:', filtered);
     return filtered;
   }, [data, searchQuery, filters]);
 

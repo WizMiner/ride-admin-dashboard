@@ -1,5 +1,5 @@
 // File: src/pages/booking/Bookings.jsx
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme.jsx';
 import { getPalette } from '../../common/themes.js';
 import { cn } from '../../common/utils.js';
@@ -9,15 +9,27 @@ import useCrud from '../../hooks/useCrud.js';
 import { bookingApi } from '../../services/bookingApi.js';
 import BookingViewModal from './BookingViewModal.jsx';
 import { useToast } from '../../hooks/useToast.jsx';
+import DriverAssignForm from './DriverAssignForm.jsx';
+import { AuthContext } from '../../contexts/AuthContextDefinition.jsx';
+import Modal from '../../components/ui/Modal';
+import { UserPlus } from 'lucide-react';
+import Tooltip from '../../components/ui/Tooltip';
+
+const transformBookings = (data) => {
+  if (Array.isArray(data)) return data;
+  return data?.items || [];
+};
 
 const Bookings = () => {
   const { currentTheme } = useTheme();
   const palette = getPalette(currentTheme);
 
-  const crud = useCrud(bookingApi);
+  // single stable crud instance
+  const crud = useCrud(bookingApi, {}, { transformData: transformBookings });
+
   const { addToast } = useToast();
 
-  // Stats
+  // Stats (derived from crud.data)
   const totalBookings = crud.data.length;
   const requestedBookings = crud.data.filter(
     (b) => b.status === 'requested'
@@ -32,7 +44,17 @@ const Bookings = () => {
     (b) => b.status === 'canceled'
   ).length;
 
-  // Columns
+  // get dispatcher id from auth context (no JWT decode)
+  const { auth } = useContext(AuthContext);
+  const dispatcherId = auth?.user?.id;
+
+  // Assign modal state
+  const [assignModal, setAssignModal] = useState({
+    open: false,
+    booking: null,
+  });
+
+  // Columns (add Assign Driver action)
   const columns = [
     {
       key: 'passenger.name',
@@ -116,7 +138,7 @@ const Bookings = () => {
       title: 'Estimated Fare',
       render: (item) => (
         <p className={cn('text-sm font-medium', palette.text)}>
-          {item.fareEstimated.toFixed(2)} Birr
+          {(item.fareEstimated ?? 0).toFixed(2)} Birr
         </p>
       ),
     },
@@ -125,8 +147,25 @@ const Bookings = () => {
       title: 'Distance (km)',
       render: (item) => (
         <p className={cn('text-sm', palette.text)}>
-          {item.distanceKm.toFixed(3)}
+          {(item.distanceKm ?? 0).toFixed(3)}
         </p>
+      ),
+    },
+    {
+      key: 'Assign Driver',
+      title: 'Assign Driver',
+      render: (b) => (
+        <Tooltip content="Assign Driver">
+          <button
+            className={cn(
+              'p-2 rounded-full transition-colors',
+              palette.btnPrimary
+            )}
+            onClick={() => setAssignModal({ open: true, booking: b })}
+          >
+            <UserPlus size={18} />
+          </button>
+        </Tooltip>
       ),
     },
   ];
@@ -190,21 +229,21 @@ const Bookings = () => {
   const handleSaveWithToast = async (entity) => {
     try {
       await crud.handleSave(entity);
-      const message = `Booking rule ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`;
-      addToast(message, 'success');
+      addToast(
+        `Booking ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`,
+        'success'
+      );
     } catch (err) {
-      const errorMessage = err?.message || 'An unexpected error occurred.';
-      addToast(errorMessage, 'error');
+      addToast(err?.message || 'An unexpected error occurred.', 'error');
     }
   };
 
   const handleDeleteWithToast = async () => {
     try {
       await crud.handleDeleteConfirm();
-      addToast('Booking rule deleted successfully!', 'success');
+      addToast('Booking deleted successfully!', 'success');
     } catch (err) {
-      const errorMessage = err?.message || 'An unexpected error occurred.';
-      addToast(errorMessage, 'error');
+      addToast(err?.message || 'An unexpected error occurred.', 'error');
     }
   };
 
@@ -263,12 +302,42 @@ const Bookings = () => {
         palette={palette}
       />
 
-      {/* Separate modal for view mode only */}
+      {/* View modal */}
       <BookingViewModal
         isOpen={crud.mode === 'view' && crud.isModalOpen}
         onClose={crud.handleCloseModal}
         booking={crud.selectedEntity}
       />
+
+      {/* Assign Driver Modal (uses stable transformBookings above) */}
+      {assignModal.open && (
+        <Modal
+          isOpen={assignModal.open}
+          onClose={() => setAssignModal({ open: false, booking: null })}
+          title="Assign Driver"
+          palette={palette}
+        >
+          <DriverAssignForm
+            booking={assignModal.booking}
+            dispatcherId={dispatcherId}
+            onCancel={() => setAssignModal({ open: false, booking: null })}
+            onSubmit={async (data) => {
+              try {
+                const bookingId =
+                  assignModal.booking?.id || assignModal.booking?._id;
+                await bookingApi.assign(bookingId, data);
+                addToast('Driver assigned successfully', 'success');
+                setAssignModal({ open: false, booking: null });
+                await crud.loadData();
+              } catch (err) {
+                addToast(err?.message || 'Failed to assign driver', 'error');
+              }
+            }}
+            loading={crud.actionLoading}
+            palette={palette}
+          />
+        </Modal>
+      )}
     </>
   );
 };

@@ -211,7 +211,8 @@ const Trips = () => {
         searchQuery={crud.searchQuery}
         onSearchChange={(e) => crud.handleSearch(e.target.value)}
         onAdd={crud.handleAdd}
-        onEdit={crud.handleEdit}
+        allowAdd={false}
+        // onEdit={crud.handleEdit}
         onView={crud.handleView}
         onDelete={crud.handleDelete}
         isModalOpen={crud.isModalOpen && crud.mode !== 'view'}

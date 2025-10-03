@@ -23,4 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 .env
+/dist.zip
 /ride_admin_dashboard.md

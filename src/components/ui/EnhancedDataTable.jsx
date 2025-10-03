@@ -15,6 +15,7 @@ const EnhancedDataTable = ({
   pageSizeOptions = [5, 10, 20],
   defaultPageSize = 10,
 }) => {
+  // console.log('EnhancedDataTable received data:', data);
   const { currentTheme } = useTheme();
   const palette = getPalette(currentTheme);
 

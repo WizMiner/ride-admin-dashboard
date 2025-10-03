@@ -10,7 +10,6 @@ import Staffs from '../pages/staff/Staffs.jsx';
 import Roles from '../pages/role/Roles.jsx';
 import Permissions from '../pages/permission/Permissions.jsx';
 import Rides from '../pages/Rides.jsx';
-import Payments from '../pages/Payments.jsx';
 import Analytics from '../pages/dashboard/Analytics.jsx';
 import Reports from '../pages/Reports.jsx';
 import Insights from '../pages/Insights.jsx';
@@ -21,7 +20,9 @@ import Help from '../pages/Help.jsx';
 
 import Bookings from '../pages/booking/Bookings.jsx';
 import Trips from '../pages/trip/Trips.jsx';
+import Payments from '../pages/Payment/Payments.jsx';
 import Pricing from '../pages/pricing/Pricing.jsx';
+import Wallet from '../pages/wallet/Wallets.jsx';
 import Live from '../pages/live/Live.jsx';
 
 export const router = createBrowserRouter([
@@ -134,6 +135,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Pricing />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'wallets',
+        element: (
+          <ProtectedRoute>
+            <Wallet />
           </ProtectedRoute>
         ),
       },
