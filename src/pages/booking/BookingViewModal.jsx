@@ -46,7 +46,7 @@ const BookingViewModal = ({ isOpen, onClose, booking }) => {
         {/* Booking ID and Status */}
         <div className="flex items-center justify-between">
           <div>
-            <h3 className={cn('text-lg font-semibold', palette.text)}>
+            {/* <h3 className={cn('text-lg font-semibold', palette.text)}>
               Booking ID: {booking.id}
             </h3>
             <p className={cn('text-sm', palette.mutedText)}>
@@ -54,7 +54,7 @@ const BookingViewModal = ({ isOpen, onClose, booking }) => {
             </p>
             <p className={cn('text-sm', palette.mutedText)}>
               Last Updated: {new Date(booking.updatedAt).toLocaleString()}
-            </p>
+            </p> */}
             <p className={cn('text-lg font-semibold', palette.mutedText)}>
               Status
             </p>

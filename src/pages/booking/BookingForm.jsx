@@ -1,10 +1,18 @@
-// File: src/pages/booking/BookingForm.jsx
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from 'react';
 import { cn } from '../../common/utils';
 import Spinner from '../../components/ui/Spinner';
 import { passengerApi } from '../../services/passengerApi';
 import { Search, RotateCcw } from 'lucide-react';
 import { useToast } from '../../hooks/useToast';
+import LocationGroup from '../../components/maps/LocationGroup';
+import LocationMap from '../../components/maps/LocationMap';
+import { useGoogleMaps } from '../../hooks/useGoogleMaps';
 
 const BookingForm = ({
   initialData = {},
@@ -13,6 +21,7 @@ const BookingForm = ({
   loading,
   palette,
 }) => {
+  const { isLoaded: mapsLoaded } = useGoogleMaps();
   const safeInitialData = useMemo(() => initialData || {}, [initialData]);
   const isEditMode = useMemo(() => !!safeInitialData.id, [safeInitialData]);
   const { addToast } = useToast();
@@ -35,7 +44,7 @@ const BookingForm = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const fetchPassengers = async () => {
+  const fetchPassengers = useCallback(async () => {
     setPassengersLoading(true);
     try {
       const data = await passengerApi.list();
@@ -47,7 +56,7 @@ const BookingForm = ({
     } finally {
       setPassengersLoading(false);
     }
-  };
+  }, [addToast]);
 
   useEffect(() => {
     setFormData({
@@ -65,7 +74,77 @@ const BookingForm = ({
 
   useEffect(() => {
     fetchPassengers();
-  }, []);
+  }, [fetchPassengers]);
+
+  // Reverse geocode for pickup - run only if address is missing
+  const pickupGeocodedRef = useRef(false);
+  useEffect(() => {
+    if (
+      pickupGeocodedRef.current ||
+      !mapsLoaded ||
+      !window.google ||
+      !formData.pickupLatitude ||
+      !formData.pickupLongitude ||
+      formData.pickupAddress.trim()
+    ) {
+      return;
+    }
+
+    const geocoder = new window.google.maps.Geocoder();
+    const pos = {
+      lat: parseFloat(formData.pickupLatitude),
+      lng: parseFloat(formData.pickupLongitude),
+    };
+    geocoder.geocode({ location: pos }, (results, status) => {
+      if (status === 'OK' && results[0]) {
+        setFormData((prev) => ({
+          ...prev,
+          pickupAddress: results[0].formatted_address,
+        }));
+        pickupGeocodedRef.current = true;
+      }
+    });
+  }, [
+    mapsLoaded,
+    formData.pickupLatitude,
+    formData.pickupLongitude,
+    formData.pickupAddress,
+  ]);
+
+  // Reverse geocode for dropoff - run only if address is missing
+  const dropoffGeocodedRef = useRef(false);
+  useEffect(() => {
+    if (
+      dropoffGeocodedRef.current ||
+      !mapsLoaded ||
+      !window.google ||
+      !formData.dropoffLatitude ||
+      !formData.dropoffLongitude ||
+      formData.dropoffAddress.trim()
+    ) {
+      return;
+    }
+
+    const geocoder = new window.google.maps.Geocoder();
+    const pos = {
+      lat: parseFloat(formData.dropoffLatitude),
+      lng: parseFloat(formData.dropoffLongitude),
+    };
+    geocoder.geocode({ location: pos }, (results, status) => {
+      if (status === 'OK' && results[0]) {
+        setFormData((prev) => ({
+          ...prev,
+          dropoffAddress: results[0].formatted_address,
+        }));
+        dropoffGeocodedRef.current = true;
+      }
+    });
+  }, [
+    mapsLoaded,
+    formData.dropoffLatitude,
+    formData.dropoffLongitude,
+    formData.dropoffAddress,
+  ]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -104,8 +183,6 @@ const BookingForm = ({
       payload.id = safeInitialData.id;
     }
 
-    // FIX: The onSubmit prop should handle its own success toast.
-    // The parent component calling BookingForm will handle success.
     try {
       await onSubmit(payload);
     } catch (err) {
@@ -134,11 +211,11 @@ const BookingForm = ({
     });
   }, [passengers, searchQuery, formData.passengerId]);
 
-  const handleSelectPassenger = (p) => {
+  const handleSelectPassenger = useCallback((p) => {
     setFormData((prev) => ({ ...prev, passengerId: p.id }));
     setSearchQuery(`${p.name} (${p.phone})`);
     setIsDropdownOpen(false);
-  };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -148,9 +225,8 @@ const BookingForm = ({
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [dropdownRef]);
+  }, []);
 
-  // FIX: Find selected passenger and initialize the search query when a new initialData is provided.
   useEffect(() => {
     const initialSelectedPassenger = passengers.find(
       (p) => p.id === safeInitialData.passengerId
@@ -163,6 +239,48 @@ const BookingForm = ({
       setSearchQuery('');
     }
   }, [safeInitialData, passengers]);
+
+  const handlePickupMapChange = useCallback((coords, address) => {
+    setFormData((prev) => ({
+      ...prev,
+      pickupLatitude: coords.latitude.toString(),
+      pickupLongitude: coords.longitude.toString(),
+      pickupAddress: address || prev.pickupAddress,
+    }));
+    pickupGeocodedRef.current = !!address;
+  }, []);
+
+  const handleDropoffMapChange = useCallback((coords, address) => {
+    setFormData((prev) => ({
+      ...prev,
+      dropoffLatitude: coords.latitude.toString(),
+      dropoffLongitude: coords.longitude.toString(),
+      dropoffAddress: address || prev.dropoffAddress,
+    }));
+    dropoffGeocodedRef.current = !!address;
+  }, []);
+
+  const pickup = useMemo(
+    () => ({
+      lat: formData.pickupLatitude ? parseFloat(formData.pickupLatitude) : null,
+      lng: formData.pickupLongitude
+        ? parseFloat(formData.pickupLongitude)
+        : null,
+    }),
+    [formData.pickupLatitude, formData.pickupLongitude]
+  );
+
+  const dropoff = useMemo(
+    () => ({
+      lat: formData.dropoffLatitude
+        ? parseFloat(formData.dropoffLatitude)
+        : null,
+      lng: formData.dropoffLongitude
+        ? parseFloat(formData.dropoffLongitude)
+        : null,
+    }),
+    [formData.dropoffLatitude, formData.dropoffLongitude]
+  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -230,9 +348,9 @@ const BookingForm = ({
                 <li
                   key={p.id}
                   className={cn(
-                    'p-2 cursor-pointer',
+                    'p-2 cursor-pointer hover:bg-gray-100',
                     palette.text,
-                    palette.hover // FIX: Apply hover class from palette
+                    palette.hover
                   )}
                   onClick={() => handleSelectPassenger(p)}
                 >
@@ -243,7 +361,7 @@ const BookingForm = ({
           )
         )}
 
-        {isDropdownOpen && filteredPassengers.length === 0 && (
+        {isDropdownOpen && filteredPassengers.length === 0 && searchQuery && (
           <div
             className={cn(
               'mt-2 p-2 rounded text-center',
@@ -279,123 +397,43 @@ const BookingForm = ({
         </select>
       </div>
 
-      <div>
-        <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-          Pickup Latitude
-        </label>
-        <input
-          type="number"
-          step="any"
-          name="pickupLatitude"
-          value={formData.pickupLatitude}
-          onChange={handleChange}
-          className={cn(
-            'w-full p-2 border rounded',
-            palette.border,
-            palette.card,
-            palette.text
-          )}
-          required
-        />
-      </div>
+      <LocationGroup
+        prefix="pickup"
+        formData={formData}
+        setFormData={setFormData}
+        palette={palette}
+        label="Pickup Location"
+      />
 
-      <div>
-        <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-          Pickup Longitude
-        </label>
-        <input
-          type="number"
-          step="any"
-          name="pickupLongitude"
-          value={formData.pickupLongitude}
-          onChange={handleChange}
-          className={cn(
-            'w-full p-2 border rounded',
-            palette.border,
-            palette.card,
-            palette.text
-          )}
-          required
-        />
-      </div>
+      <LocationGroup
+        prefix="dropoff"
+        formData={formData}
+        setFormData={setFormData}
+        palette={palette}
+        label="Dropoff Location"
+      />
 
-      <div>
-        <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-          Pickup Address
-        </label>
-        <input
-          type="text"
-          name="pickupAddress"
-          value={formData.pickupAddress}
-          onChange={handleChange}
-          className={cn(
-            'w-full p-2 border rounded',
-            palette.border,
-            palette.card,
-            palette.text
-          )}
-          required
+      {/* Integrated Google Map for visualization and editing */}
+      {mapsLoaded ? (
+        <LocationMap
+          pickup={pickup}
+          dropoff={dropoff}
+          onPickupChange={handlePickupMapChange}
+          onDropoffChange={handleDropoffMapChange}
+          palette={palette}
         />
-      </div>
-
-      <div>
-        <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-          Dropoff Latitude
-        </label>
-        <input
-          type="number"
-          step="any"
-          name="dropoffLatitude"
-          value={formData.dropoffLatitude}
-          onChange={handleChange}
+      ) : (
+        <div
           className={cn(
-            'w-full p-2 border rounded',
+            'h-96 flex items-center justify-center border rounded',
             palette.border,
-            palette.card,
-            palette.text
+            palette.card
           )}
-          required
-        />
-      </div>
-
-      <div>
-        <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-          Dropoff Longitude
-        </label>
-        <input
-          type="number"
-          step="any"
-          name="dropoffLongitude"
-          value={formData.dropoffLongitude}
-          onChange={handleChange}
-          className={cn(
-            'w-full p-2 border rounded',
-            palette.border,
-            palette.card,
-            palette.text
-          )}
-          required
-        />
-      </div>
-
-      <div>
-        <label className={cn('block text-sm font-medium mb-1', palette.text)}>
-          Dropoff Address
-        </label>
-        <input
-          type="text"
-          name="dropoffAddress"
-          value={formData.dropoffAddress}
-          onChange={handleChange}
-          className={cn(
-            'w-full p-2 border rounded',
-            palette.border,
-            palette.card,
-            palette.text
-          )}
-          required
-        />
-      </div>
+        >
+          <Spinner size="large" />
+          <span className={cn('ml-2', palette.mutedText)}>Loading map...</span>
+        </div>
+      )}
 
       {isEditMode && (
         <div>
@@ -437,10 +475,12 @@ const BookingForm = ({
         </button>
         <button
           type="submit"
-          disabled={loading || passengersLoading}
+          disabled={loading || passengersLoading || !mapsLoaded}
           className={cn(
             'px-4 py-2 rounded-md text-white flex items-center justify-center',
-            palette.btnPrimary
+            palette.btnPrimary,
+            (!mapsLoaded || loading || passengersLoading) &&
+              'opacity-50 cursor-not-allowed'
           )}
         >
           {(loading || passengersLoading) && (

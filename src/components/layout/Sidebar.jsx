@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   CalendarCheck,
+  Clipboard,
   Radio,
   Key,
   UserCog,
@@ -73,6 +74,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       title: 'Bookings',
       items: [
         { path: '/bookings', label: 'Bookings', icon: CalendarCheck },
+        { path: '/assignments', label: 'Assignments', icon: Clipboard },
         { path: '/trips', label: 'Trips', icon: Car },
         { path: '/payments', label: 'Payments', icon: CreditCard },
         { path: '/pricing', label: 'Pricing', icon: Tag },

@@ -24,6 +24,7 @@ import Payments from '../pages/Payment/Payments.jsx';
 import Pricing from '../pages/pricing/Pricing.jsx';
 import Wallet from '../pages/wallet/Wallets.jsx';
 import Live from '../pages/live/Live.jsx';
+import Assignments from '../pages/assignment/Assignments.jsx';
 
 export const router = createBrowserRouter([
   {
@@ -119,6 +120,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Bookings />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'assignments',
+        element: (
+          <ProtectedRoute>
+            <Assignments />
           </ProtectedRoute>
         ),
       },

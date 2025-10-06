@@ -38,7 +38,7 @@ const Analytics = () => {
 
   const stats = [
     {
-      title: 'Total Users Type',
+      title: 'Total Users',
       value: isLoadingDashboard
         ? '...'
         : overview?.totalUsers.toLocaleString() || '0',

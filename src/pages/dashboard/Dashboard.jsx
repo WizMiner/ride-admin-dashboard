@@ -22,7 +22,7 @@ const Dashboard = () => {
 
   const stats = [
     {
-      title: 'Total Users Type',
+      title: 'Total Users',
       value: isLoadingData
         ? '...'
         : overview?.totalUsers?.toLocaleString() || '0',
@@ -54,6 +54,42 @@ const Dashboard = () => {
         ? '...'
         : `Birr${overview?.totalEarnings?.toFixed(2) || '0.00'}`,
       change: isLoadingData ? '...' : '+8.7%',
+      trend: 'up',
+      icon: CreditCard,
+    },
+    {
+      title: 'Total Cars',
+      value: isLoadingData
+        ? '...'
+        : `${overview?.totalCars?.toFixed(2) || '0.0'}`,
+      change: isLoadingData ? '...' : '+1.7%',
+      trend: 'up',
+      icon: Car,
+    },
+    {
+      title: 'Total Commission',
+      value: isLoadingData
+        ? '...'
+        : `${overview?.totalCommission?.toFixed() || '0.00'}`,
+      change: isLoadingData ? '...' : '+8.7%',
+      trend: 'up',
+      icon: CreditCard,
+    },
+    {
+      title: 'Total Complaints',
+      value: isLoadingData
+        ? '...'
+        : `${overview?.totalComplaints?.toFixed() || '0.0'}`,
+      change: isLoadingData ? '...' : '+1.7%',
+      trend: 'up',
+      icon: CreditCard,
+    },
+    {
+      title: 'Total pending Payouts',
+      value: isLoadingData
+        ? '...'
+        : `${overview?.pendingPayouts?.toFixed() || '0.0'}`,
+      change: isLoadingData ? '...' : '+2.7%',
       trend: 'up',
       icon: CreditCard,
     },

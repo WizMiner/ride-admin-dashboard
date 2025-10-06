@@ -49,6 +49,7 @@ const Wallets = () => {
         isLoading={crud.isLoading}
         searchQuery={crud.searchQuery}
         onSearchChange={(e) => crud.handleSearch(e.target.value)}
+        allowAdd={false}
         onView={crud.handleView}
         isModalOpen={crud.mode === 'view' && crud.isModalOpen}
         onModalClose={crud.handleCloseModal}
