@@ -333,6 +333,7 @@ const Passengers = () => {
             onSubmit={handleSaveWithToast}
             onCancel={crud.handleCloseModal}
             loading={crud.actionLoading}
+            palette={palette}
           />
         )}
         palette={palette}

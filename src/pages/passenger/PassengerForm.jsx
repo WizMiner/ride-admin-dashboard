@@ -1,29 +1,39 @@
 // File: src/pages/passenger/PassengerForm.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { cn } from '../../common/utils';
+import FormInput from '../../components/forms/FormInput';
+import FormTextarea from '../../components/forms/FormTextarea';
 import Spinner from '../../components/ui/Spinner';
 
-const PassengerForm = ({ initialData = {}, onSubmit, onCancel, loading }) => {
+const PassengerForm = ({
+  initialData = {},
+  onSubmit,
+  onCancel,
+  loading,
+  palette = {},
+}) => {
+  const safeInitialData = useMemo(() => initialData || {}, [initialData]);
+
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     email: '',
     password: '',
     emergencyContacts: [{ name: '', phone: '', relationship: '' }],
-    ...initialData,
   });
 
   useEffect(() => {
-    // Reset form data when initialData changes
     setFormData({
-      name: '',
-      phone: '',
-      email: '',
+      name: safeInitialData.name || '',
+      phone: safeInitialData.phone || '',
+      email: safeInitialData.email || '',
       password: '',
-      emergencyContacts: [{ name: '', phone: '', relationship: '' }],
-      ...initialData,
+      emergencyContacts:
+        safeInitialData.emergencyContacts?.length > 0
+          ? safeInitialData.emergencyContacts
+          : [{ name: '', phone: '', relationship: '' }],
     });
-  }, [initialData]);
+  }, [safeInitialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,8 +42,8 @@ const PassengerForm = ({ initialData = {}, onSubmit, onCancel, loading }) => {
 
   const handleEmergencyContactChange = (index, e) => {
     const { name, value } = e.target;
-    const newContacts = [...formData.emergencyContacts];
-    newContacts[index][name] = value;
+    const newContacts = [...(formData.emergencyContacts || [])];
+    newContacts[index] = { ...newContacts[index], [name]: value };
     setFormData((prev) => ({ ...prev, emergencyContacts: newContacts }));
   };
 
@@ -41,112 +51,109 @@ const PassengerForm = ({ initialData = {}, onSubmit, onCancel, loading }) => {
     setFormData((prev) => ({
       ...prev,
       emergencyContacts: [
-        ...prev.emergencyContacts,
+        ...(prev.emergencyContacts || []),
         { name: '', phone: '', relationship: '' },
       ],
     }));
   };
 
   const removeEmergencyContact = (index) => {
-    const newContacts = [...formData.emergencyContacts];
+    const newContacts = [...(formData.emergencyContacts || [])];
     newContacts.splice(index, 1);
     setFormData((prev) => ({ ...prev, emergencyContacts: newContacts }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    // Assuming the API expects emergencyContacts to be an array of objects
+    // Filter out any contacts that are empty (optional logic)
+    const contactsToSend = (formData.emergencyContacts || []).filter(
+      (c) => c.name || c.phone
+    );
+    onSubmit({ ...formData, emergencyContacts: contactsToSend });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-1">Name</label>
-        <input
-          type="text"
-          name="name"
-          value={formData.name || ''}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-          required
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium mb-1">Phone</label>
-        <input
-          type="text"
-          name="phone"
-          value={formData.phone || ''}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-          required
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium mb-1">Email</label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email || ''}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium mb-1">Password</label>
-        <input
-          type="password"
-          name="password"
-          value={formData.password || ''}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-      </div>
+      {/* All FormInputs rely on the 'palette' prop for theming */}
+      <FormInput
+        label="Name"
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+        required
+        palette={palette}
+      />
+      <FormInput
+        label="Phone"
+        name="phone"
+        value={formData.phone}
+        onChange={handleChange}
+        required
+        palette={palette}
+      />
+      <FormInput
+        label="Email"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        palette={palette}
+      />
+      <FormInput
+        label="Password"
+        name="password"
+        type="password"
+        value={formData.password}
+        onChange={handleChange}
+        palette={palette}
+      />
 
       <div>
-        <h3 className="text-md font-semibold mb-2">Emergency Contacts</h3>
+        <h3 className={cn('text-md font-semibold mb-2', palette.text)}>
+          Emergency Contacts
+        </h3>
         <div className="space-y-3">
-          {formData.emergencyContacts.map((contact, index) => (
+          {(formData.emergencyContacts || []).map((contact, index) => (
             <div
               key={index}
-              className="flex flex-col md:flex-row items-end gap-2 p-3 border rounded-md"
+              // The container uses a theme-aware border
+              className={cn(
+                'flex flex-col md:flex-row items-end gap-2 p-3 border rounded-md',
+                palette.border
+              )}
             >
-              <div className="flex-1 w-full">
-                <label className="block text-xs font-medium mb-1">Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={contact.name}
-                  onChange={(e) => handleEmergencyContactChange(index, e)}
-                  className="w-full p-2 border rounded text-sm"
-                />
-              </div>
-              <div className="flex-1 w-full">
-                <label className="block text-xs font-medium mb-1">Phone</label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={contact.phone}
-                  onChange={(e) => handleEmergencyContactChange(index, e)}
-                  className="w-full p-2 border rounded text-sm"
-                />
-              </div>
-              <div className="flex-1 w-full">
-                <label className="block text-xs font-medium mb-1">
-                  Relationship
-                </label>
-                <input
-                  type="text"
-                  name="relationship"
-                  value={contact.relationship}
-                  onChange={(e) => handleEmergencyContactChange(index, e)}
-                  className="w-full p-2 border rounded text-sm"
-                />
-              </div>
+              {/* These inputs also rely on the FormInput component's internal dark mode logic */}
+              <FormInput
+                label="Name"
+                name="name"
+                value={contact.name}
+                onChange={(e) => handleEmergencyContactChange(index, e)}
+                palette={palette}
+              />
+              <FormInput
+                label="Phone"
+                name="phone"
+                value={contact.phone}
+                onChange={(e) => handleEmergencyContactChange(index, e)}
+                palette={palette}
+              />
+              <FormInput
+                label="Relationship"
+                name="relationship"
+                value={contact.relationship}
+                onChange={(e) => handleEmergencyContactChange(index, e)}
+                palette={palette}
+              />
               <button
                 type="button"
                 onClick={() => removeEmergencyContact(index)}
-                className="px-3 py-2 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
+                className={cn(
+                  'px-3 py-2 text-sm rounded-md border',
+                  // Using theme-aware classes for a neutral/secondary action
+                  // bg-primary-100 is typically a light version of the primary color
+                  'text-primary bg-primary-100 hover:opacity-80',
+                  palette.border
+                )}
               >
                 Remove
               </button>
@@ -155,7 +162,12 @@ const PassengerForm = ({ initialData = {}, onSubmit, onCancel, loading }) => {
           <button
             type="button"
             onClick={addEmergencyContact}
-            className="w-full py-2 border border-dashed rounded-md text-gray-500 hover:bg-gray-100"
+            className={cn(
+              'w-full py-2 border border-dashed rounded-md',
+              // Using theme-aware classes for 'Add' button:
+              'text-muted-theme hover-theme',
+              palette.border
+            )}
           >
             Add Emergency Contact
           </button>
@@ -167,7 +179,11 @@ const PassengerForm = ({ initialData = {}, onSubmit, onCancel, loading }) => {
           type="button"
           onClick={onCancel}
           className={cn(
-            'px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+            'px-4 py-2 rounded-md border',
+            palette.border,
+            palette.card, // Background color
+            palette.text, // Text color
+            palette.hover // Hover background
           )}
           disabled={loading}
         >
@@ -176,10 +192,13 @@ const PassengerForm = ({ initialData = {}, onSubmit, onCancel, loading }) => {
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 rounded-md bg-blue-600 text-white flex items-center justify-center"
+          className={cn(
+            'px-4 py-2 rounded-md text-white flex items-center justify-center',
+            palette.btnPrimary
+          )}
         >
           {loading && <Spinner size="small" className="mr-2" />}
-          {loading ? 'Saving...' : 'Save'}
+          {loading ? 'Saving...' : safeInitialData.id ? 'Update' : 'Create'}
         </button>
       </div>
     </form>

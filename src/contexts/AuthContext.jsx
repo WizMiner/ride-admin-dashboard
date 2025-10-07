@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
     loading: true,
   });
 
+  // 🧹 Logout clears all authentication data
   const logout = useCallback(() => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -29,39 +30,43 @@ export const AuthProvider = ({ children }) => {
     });
   }, []);
 
-  // Initialize on load (decode JWT)
+  // 🧠 Initialize authentication from localStorage on app load
   useEffect(() => {
-    if (auth.token) {
-      try {
-        const decoded = JSON.parse(atob(auth.token.split('.')[1]));
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
 
-        // Normalize roles
+    if (storedToken && storedUser) {
+      try {
+        const decoded = JSON.parse(atob(storedToken.split('.')[1]));
+
+        // Normalize roles from JWT
         let normalizedRoles = [];
         if (decoded.roles && decoded.roles.length > 0) {
-          normalizedRoles = decoded.roles; // e.g. ["superadmin"]
+          normalizedRoles = decoded.roles;
         } else if (decoded.type) {
-          normalizedRoles = [decoded.type]; // fallback (admin / staff)
+          normalizedRoles = [decoded.type]; // fallback for simple tokens
         }
 
         const isSuperAdmin = normalizedRoles.includes('superadmin');
         const permissions = decoded.permissions || [];
 
-        setAuth((prev) => ({
-          ...prev,
+        setAuth({
+          token: storedToken,
+          user: JSON.parse(storedUser),
+          roles: normalizedRoles,
           isAuthenticated: true,
           isSuperAdmin,
           permissions,
-          roles: normalizedRoles,
           loading: false,
-        }));
+        });
       } catch (error) {
-        console.error('Token invalid:', error);
+        console.error('Token invalid or malformed:', error);
         logout();
       }
     } else {
       setAuth((prev) => ({ ...prev, loading: false }));
     }
-  }, [auth.token, logout]);
+  }, [logout]);
 
   const login = async (username, password, userType = 'admin') => {
     try {
@@ -70,48 +75,56 @@ export const AuthProvider = ({ children }) => {
         userType === 'staff'
           ? '/api/auth/staff/login'
           : '/api/auth/admin/login';
+
       const { data } = await api.post(endpoint, { username, password });
 
-      if (data.token) {
-        const decoded = JSON.parse(atob(data.token.split('.')[1]));
-
-        // normalize roles
-        let normalizedRoles = [];
-        if (decoded.roles && decoded.roles.length > 0) {
-          normalizedRoles = decoded.roles;
-        } else if (decoded.type) {
-          normalizedRoles = [decoded.type];
-        }
-
-        const isSuperAdmin = normalizedRoles.includes('superadmin');
-
-        // save
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.admin || data.staff));
-        localStorage.setItem('roles', JSON.stringify(normalizedRoles));
-
-        setAuth({
-          token: data.token,
-          user: data.admin || data.staff,
-          roles: normalizedRoles,
-          isAuthenticated: true,
-          isSuperAdmin,
-          permissions: decoded.permissions || [],
-          loading: false,
-        });
-
-        return { success: true, roles: normalizedRoles };
+      if (!data?.token) {
+        return {
+          success: false,
+          message: data?.message || 'Invalid credentials',
+        };
       }
 
-      return { success: false, message: data.message || 'Invalid credentials' };
+      const decoded = JSON.parse(atob(data.token.split('.')[1]));
+
+      // Normalize roles
+      let normalizedRoles = [];
+      if (decoded.roles && decoded.roles.length > 0) {
+        normalizedRoles = decoded.roles;
+      } else if (decoded.type) {
+        normalizedRoles = [decoded.type];
+      }
+
+      const isSuperAdmin = normalizedRoles.includes('superadmin');
+      const userData = data.admin || data.staff || null;
+
+      // Persist to localStorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('roles', JSON.stringify(normalizedRoles));
+
+      // Update state
+      setAuth({
+        token: data.token,
+        user: userData,
+        roles: normalizedRoles,
+        isAuthenticated: true,
+        isSuperAdmin,
+        permissions: decoded.permissions || [],
+        loading: false,
+      });
+
+      return { success: true, roles: normalizedRoles };
     } catch (error) {
-      return { success: false, message: error.message };
+      console.error('Login error:', error);
+      return { success: false, message: error.message || 'Login failed' };
     }
   };
 
   return (
     <AuthContext.Provider value={{ auth, login, logout }}>
-      {children}
+      {/* Render children only after auth check */}
+      {!auth.loading && children}
     </AuthContext.Provider>
   );
 };

@@ -23,6 +23,7 @@ const EnhancedDataTable = ({
   const [pageSize, setPageSize] = useState(defaultPageSize);
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const hasActions = onView || onEdit || onDelete;
 
   // 🔹 Sorting logic
   const sortedData = useMemo(() => {
@@ -117,17 +118,22 @@ const EnhancedDataTable = ({
                   </div>
                 </th>
               ))}
-              <th
-                className={cn(
-                  'text-left p-4 font-medium text-sm uppercase tracking-wider',
-                  palette.mutedText,
-                  palette.primaryLightBg
-                )}
-              >
-                Actions
-              </th>
+
+              {/* ✅ Only render the Actions column if any action is provided */}
+              {hasActions && (
+                <th
+                  className={cn(
+                    'text-left p-4 font-medium text-sm uppercase tracking-wider',
+                    palette.mutedText,
+                    palette.primaryLightBg
+                  )}
+                >
+                  Actions
+                </th>
+              )}
             </tr>
           </thead>
+
           <tbody>
             {paginatedData.map((item, index) => (
               <tr
@@ -142,49 +148,53 @@ const EnhancedDataTable = ({
                       : getValue(item, column.key)}
                   </td>
                 ))}
-                <td className="p-4">
-                  <div className="flex items-center gap-2">
-                    {onView && (
-                      <button
-                        className={cn(
-                          'p-2 rounded transition-colors',
-                          palette.mutedText,
-                          'hover:text-primary-500 hover:bg-primary-100 dark:hover:bg-primary-900/20'
-                        )}
-                        title="View Details"
-                        onClick={() => onView(item)}
-                      >
-                        <Eye size={16} />
-                      </button>
-                    )}
-                    {onEdit && (
-                      <button
-                        className={cn(
-                          'p-2 rounded transition-colors',
-                          palette.mutedText,
-                          'hover:text-green-600 hover:bg-green-100 dark:hover:bg-green-900/20'
-                        )}
-                        title="Edit"
-                        onClick={() => onEdit(item)}
-                      >
-                        <Edit size={16} />
-                      </button>
-                    )}
-                    {onDelete && (
-                      <button
-                        className={cn(
-                          'p-2 rounded transition-colors',
-                          palette.mutedText,
-                          'hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20'
-                        )}
-                        title="Delete"
-                        onClick={() => onDelete(item)}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    )}
-                  </div>
-                </td>
+
+                {/* ✅ Only render actions cell if at least one action exists */}
+                {hasActions && (
+                  <td className="p-4">
+                    <div className="flex items-center gap-2">
+                      {onView && (
+                        <button
+                          className={cn(
+                            'p-2 rounded transition-colors',
+                            palette.mutedText,
+                            'hover:text-primary-500 hover:bg-primary-100 dark:hover:bg-primary-900/20'
+                          )}
+                          title="View Details"
+                          onClick={() => onView(item)}
+                        >
+                          <Eye size={16} />
+                        </button>
+                      )}
+                      {onEdit && (
+                        <button
+                          className={cn(
+                            'p-2 rounded transition-colors',
+                            palette.mutedText,
+                            'hover:text-green-600 hover:bg-green-100 dark:hover:bg-green-900/20'
+                          )}
+                          title="Edit"
+                          onClick={() => onEdit(item)}
+                        >
+                          <Edit size={16} />
+                        </button>
+                      )}
+                      {onDelete && (
+                        <button
+                          className={cn(
+                            'p-2 rounded transition-colors',
+                            palette.mutedText,
+                            'hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20'
+                          )}
+                          title="Delete"
+                          onClick={() => onDelete(item)}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

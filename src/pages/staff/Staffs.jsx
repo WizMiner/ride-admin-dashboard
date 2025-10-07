@@ -47,7 +47,7 @@ const Staffs = () => {
             <p className={cn('font-medium', palette.text)}>
               {item.fullName || 'Unknown'}
             </p>
-            <p className={cn('text-sm', palette.mutedText)}>@{item.username}</p>
+            <p className={cn('text-sm', palette.mutedText)}>{item.username}</p>
           </div>
         </div>
       ),

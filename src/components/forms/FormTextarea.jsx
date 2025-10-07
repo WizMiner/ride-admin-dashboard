@@ -33,3 +33,5 @@ const FormTextarea = ({
     </div>
   );
 };
+
+export default FormTextarea;

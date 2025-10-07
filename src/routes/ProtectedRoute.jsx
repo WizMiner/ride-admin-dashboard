@@ -1,3 +1,4 @@
+// src/routes/ProtectedRoute.jsx
 import { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContextDefinition';
@@ -19,8 +20,9 @@ const ProtectedRoute = ({
     return <Navigate to="/" replace />;
   }
 
-  if (allowedRoles.length && !allowedRoles.some((r) => userRoles.includes(r))) {
-    return <Navigate to="/" replace />;
+  if (allowedRoles.length > 0) {
+    const hasAccess = userRoles.some((role) => allowedRoles.includes(role));
+    if (!hasAccess) return <Navigate to="/" replace />;
   }
 
   return children;

@@ -1,4 +1,5 @@
-import React from 'react';
+// src/components/layout/Sidebar.jsx
+import React, { useContext, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   CalendarCheck,
@@ -9,7 +10,7 @@ import {
   Home,
   Users,
   Car,
-  // MapPin,
+  MapPin,
   CreditCard,
   Tag,
   Wallet,
@@ -27,7 +28,6 @@ import { cn } from '../../common/utils';
 import { useTheme } from '../../hooks/useTheme.jsx';
 import { getPalette } from '../../common/themes';
 import { AuthContext } from '../../contexts/AuthContextDefinition';
-import { useContext } from 'react';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const { auth, logout } = useContext(AuthContext);
@@ -35,16 +35,22 @@ const Sidebar = ({ isOpen, onClose }) => {
   const { currentTheme } = useTheme();
   const palette = getPalette(currentTheme);
 
-  const [expandedGroups, setExpandedGroups] = React.useState({
+  const [expandedGroups, setExpandedGroups] = useState({
     dashboard: true,
     management: true,
+    bookings: true,
     analytics: true,
-    Bookings: true,
     system: true,
+    contracts: true,
   });
 
   const toggleGroup = (groupKey) => {
     setExpandedGroups((prev) => ({ ...prev, [groupKey]: !prev[groupKey] }));
+  };
+
+  const hasRole = (roles = []) => {
+    if (!roles.length) return true;
+    return roles.some((role) => auth.roles.includes(role));
   };
 
   const menuItems = [
@@ -60,47 +66,151 @@ const Sidebar = ({ isOpen, onClose }) => {
       group: 'management',
       title: 'Management',
       items: [
-        { path: '/admins', label: 'Admins', icon: UserCog },
-        { path: '/roles', label: 'Roles', icon: Shield },
-        { path: '/staffs', label: 'Staffs', icon: Users },
-        { path: '/drivers', label: 'Drivers', icon: Car },
-        { path: '/passengers', label: 'Passengers', icon: Users },
-        { path: '/permissions', label: 'Permissions', icon: Key },
-        // { path: '/rides', label: 'Rides', icon: MapPin },
+        {
+          path: '/admins',
+          label: 'Admins',
+          icon: UserCog,
+          roles: ['admin', 'superadmin'],
+        },
+        {
+          path: '/roles',
+          label: 'Roles',
+          icon: Shield,
+          roles: ['admin', 'superadmin'],
+        },
+        {
+          path: '/staffs',
+          label: 'Staffs',
+          icon: Users,
+          roles: ['admin', 'superadmin'],
+        },
+        {
+          path: '/drivers',
+          label: 'Drivers',
+          icon: Car,
+          roles: ['admin', 'superadmin'],
+        },
+        {
+          path: '/passengers',
+          label: 'Passengers',
+          icon: Users,
+          roles: ['admin', 'superadmin'],
+        },
+        {
+          path: '/permissions',
+          label: 'Permissions',
+          icon: Key,
+          roles: ['admin', 'superadmin'],
+        },
       ],
     },
     {
-      group: 'Bookings',
-      title: 'Bookings',
+      group: 'bookings',
+      title: 'Bookings & Finance',
       items: [
-        { path: '/bookings', label: 'Bookings', icon: CalendarCheck },
-        { path: '/assignments', label: 'Assignments', icon: Clipboard },
-        { path: '/trips', label: 'Trips', icon: Car },
-        { path: '/payments', label: 'Payments', icon: CreditCard },
-        { path: '/pricing', label: 'Pricing', icon: Tag },
-        { path: '/wallets', label: 'Wallets', icon: Wallet },
-        { path: '/lives', label: 'Live', icon: Radio },
+        {
+          path: '/bookings',
+          label: 'Bookings',
+          icon: CalendarCheck,
+          roles: ['admin', 'staff', 'superadmin'],
+        },
+        {
+          path: '/assignments',
+          label: 'Assignments',
+          icon: Clipboard,
+          roles: ['admin', 'staff', 'superadmin'],
+        },
+        {
+          path: '/trips',
+          label: 'Trips',
+          icon: Car,
+          roles: ['admin', 'staff', 'superadmin'],
+        },
+        {
+          path: '/payments',
+          label: 'Payments',
+          icon: CreditCard,
+          roles: ['admin', 'staff', 'superadmin'],
+        },
+        {
+          path: '/pricing',
+          label: 'Pricing',
+          icon: Tag,
+          roles: ['admin', 'superadmin'],
+        },
+        {
+          path: '/wallets',
+          label: 'Wallets',
+          icon: Wallet,
+          roles: ['admin', 'staff', 'superadmin'],
+        },
+        {
+          path: '/lives',
+          label: 'Live',
+          icon: Radio,
+          roles: ['admin', 'staff', 'superadmin'],
+        },
+        { path: '/rides', label: 'Rides', icon: MapPin },
+      ],
+    },
+    {
+      group: 'contracts',
+      title: 'Contracts & Payments',
+      items: [
+        {
+          path: '/contracts',
+          label: 'Contracts',
+          icon: Radio,
+          roles: ['admin', 'superadmin'],
+        },
+        // {
+        //   path: '/payments',
+        //   label: 'contracts Payments',
+        //   icon: BarChart3,
+        //   roles: ['admin', 'superadmin'],
+        // },
       ],
     },
     {
       group: 'analytics',
-      title: 'Analytics',
+      title: 'Reports & Insights',
       items: [
-        { path: '/reports', label: 'Reports', icon: FileText },
-        { path: '/insights', label: 'Insights', icon: BarChart3 },
+        {
+          path: '/reports',
+          label: 'Reports',
+          icon: FileText,
+          roles: ['admin', 'superadmin'],
+        },
+        {
+          path: '/insights',
+          label: 'Insights',
+          icon: BarChart3,
+          roles: ['admin', 'superadmin'],
+        },
       ],
     },
     {
       group: 'system',
       title: 'System',
       items: [
-        { path: '/notifications', label: 'Notifications', icon: Bell },
-        ...(auth.isSuperAdmin
-          ? [
-              { path: '/settings', label: 'Settings', icon: Settings },
-              { path: '/security', label: 'Security', icon: Shield },
-            ]
-          : []),
+        {
+          path: '/notifications',
+          label: 'Notifications',
+          icon: Bell,
+          roles: ['staff'],
+        },
+        {
+          path: '/settings',
+          label: 'Settings',
+          icon: Settings,
+          roles: ['superadmin'],
+        },
+        {
+          path: '/security',
+          label: 'Security',
+          icon: Shield,
+          roles: ['superadmin'],
+        },
         { path: '/help', label: 'Help & Support', icon: HelpCircle },
       ],
     },
@@ -166,27 +276,29 @@ const Sidebar = ({ isOpen, onClose }) => {
                 </button>
                 {expandedGroups[group.group] && (
                   <div className="space-y-1 ml-2">
-                    {group.items.map((item) => {
-                      const Icon = item.icon;
-                      const active = isActive(item.path);
-                      return (
-                        <Link
-                          key={item.path}
-                          to={item.path}
-                          onClick={onClose}
-                          className={cn(
-                            'flex items-center gap-3 rounded-lg px-3 py-2 transition-colors',
-                            palette.sidebarText,
-                            palette.sidebarHoverBg,
-                            active && palette.sidebarActiveBg,
-                            active && palette.sidebarActiveText
-                          )}
-                        >
-                          <Icon size={18} />
-                          <span className="truncate">{item.label}</span>
-                        </Link>
-                      );
-                    })}
+                    {group.items
+                      .filter((item) => hasRole(item.roles))
+                      .map((item) => {
+                        const Icon = item.icon;
+                        const active = isActive(item.path);
+                        return (
+                          <Link
+                            key={item.path}
+                            to={item.path}
+                            onClick={onClose}
+                            className={cn(
+                              'flex items-center gap-3 rounded-lg px-3 py-2 transition-colors',
+                              palette.sidebarText,
+                              palette.sidebarHoverBg,
+                              active && palette.sidebarActiveBg,
+                              active && palette.sidebarActiveText
+                            )}
+                          >
+                            <Icon size={18} />
+                            <span className="truncate">{item.label}</span>
+                          </Link>
+                        );
+                      })}
                   </div>
                 )}
               </div>
@@ -207,17 +319,15 @@ const Sidebar = ({ isOpen, onClose }) => {
                 )}
               >
                 <span className="text-white font-semibold text-sm">
-                  {auth.admin?.fullName?.[0] || 'A'}
+                  {auth.user?.fullName?.[0] || 'A'}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className={cn('text-sm font-medium truncate', palette.text)}>
-                  {auth.admin?.fullName || 'Admin User'}
+                  {auth.user?.fullName || 'Admin User'}
                 </p>
                 <p className={cn('text-xs truncate', palette.sidebarMuted)}>
-                  {auth.admin?.email ||
-                    auth.admin?.username ||
-                    'admin@ride.com'}
+                  {auth.user?.email || auth.user?.username || 'admin@ride.com'}
                 </p>
               </div>
               <button
