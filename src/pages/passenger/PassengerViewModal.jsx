@@ -82,7 +82,7 @@ const PassengerViewModal = ({ isOpen, onClose, passenger }) => {
 
           {/* Wallet and Rating */}
           <div className="grid grid-cols-2 gap-4">
-            <div className={cn('p-4 rounded-lg', palette.primaryLightBg)}>
+            {/* <div className={cn('p-4 rounded-lg', palette.primaryLightBg)}>
               <div className="flex items-center gap-2 mb-1">
                 <Wallet size={16} className={cn(palette.mutedText)} />
                 <span className={cn('text-sm font-medium', palette.text)}>
@@ -92,7 +92,7 @@ const PassengerViewModal = ({ isOpen, onClose, passenger }) => {
               <p className={cn('text-lg font-semibold', 'text-green-600')}>
                 Birr {parseFloat(passenger.wallet || 0).toFixed(2)}
               </p>
-            </div>
+            </div> */}
 
             <div className={cn('p-4 rounded-lg', palette.primaryLightBg)}>
               <div className="flex items-center gap-2 mb-1">

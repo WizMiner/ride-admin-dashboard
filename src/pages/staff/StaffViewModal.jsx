@@ -116,12 +116,6 @@ const StaffViewModal = ({ isOpen, onClose, staff }) => {
                 </>
               )}
             </div>
-            <div className="flex items-center gap-2">
-              <Calendar size={16} className={cn(palette.mutedText)} />
-              <span className={cn('text-sm', palette.text)}>
-                Hired: {new Date(staff.createdAt).toLocaleDateString()}
-              </span>
-            </div>
           </div>
         </div>
 

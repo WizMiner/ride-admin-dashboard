@@ -44,6 +44,14 @@ const BookingForm = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  const formControlClasses = cn(
+    'w-full p-2 border rounded transition-colors duration-150',
+    palette.border,
+    palette.card,
+    palette.text,
+    palette.focusRing
+  );
+
   const fetchPassengers = useCallback(async () => {
     setPassengersLoading(true);
     try {
@@ -292,16 +300,12 @@ const BookingForm = ({
         <div className="relative flex items-center">
           <input
             type="text"
-            className={cn(
-              'w-full p-2 pr-10 border rounded',
-              palette.border,
-              palette.card,
-              palette.text
-            )}
+            className={cn('p-2 pr-10', formControlClasses)}
             placeholder="Search by name, phone, or email"
             value={searchQuery}
             onChange={handleSearchChange}
             onFocus={() => setIsDropdownOpen(true)}
+            required // Added required attribute
           />
           <Search
             size={20}
@@ -348,7 +352,7 @@ const BookingForm = ({
                 <li
                   key={p.id}
                   className={cn(
-                    'p-2 cursor-pointer hover:bg-gray-100',
+                    'p-2 cursor-pointer',
                     palette.text,
                     palette.hover
                   )}
@@ -383,12 +387,7 @@ const BookingForm = ({
           name="vehicleType"
           value={formData.vehicleType}
           onChange={handleChange}
-          className={cn(
-            'w-full p-2 border rounded',
-            palette.border,
-            palette.card,
-            palette.text
-          )}
+          className={formControlClasses}
           required
         >
           <option value="mini">Mini</option>
@@ -444,12 +443,7 @@ const BookingForm = ({
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className={cn(
-              'w-full p-2 border rounded',
-              palette.border,
-              palette.card,
-              palette.text
-            )}
+            className={formControlClasses}
           >
             <option value="requested">Requested</option>
             <option value="accepted">Accepted</option>

@@ -54,7 +54,7 @@ const Staffs = () => {
     },
     {
       key: 'roles',
-      title: 'Role', // Updated title to be more accurate
+      title: 'Role',
       render: (item) => (
         <p className={cn('text-sm font-medium', palette.text)}>
           {/* Access the name from the roles array. Use a fallback for items with no roles */}
@@ -80,15 +80,15 @@ const Staffs = () => {
         );
       },
     },
-    {
-      key: 'salary',
-      title: 'Salary',
-      render: (item) => (
-        <p className={cn('text-sm font-medium', palette.text)}>
-          Birr{parseFloat(item.salary || 0).toFixed(2)}
-        </p>
-      ),
-    },
+    // {
+    //   key: 'salary',
+    //   title: 'Salary',
+    //   render: (item) => (
+    //     <p className={cn('text-sm font-medium', palette.text)}>
+    //       Birr{parseFloat(item.salary || 0).toFixed(2)}
+    //     </p>
+    //   ),
+    // },
   ];
 
   const renderStats = () => (

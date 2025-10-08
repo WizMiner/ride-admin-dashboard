@@ -277,7 +277,7 @@ const Bookings = () => {
         searchQuery={crud.searchQuery}
         onSearchChange={(e) => crud.handleSearch(e.target.value)}
         onAdd={crud.handleAdd}
-        onEdit={crud.handleEdit}
+        // onEdit={crud.handleEdit}
         onView={crud.handleView}
         onDelete={crud.handleDelete}
         isModalOpen={crud.isModalOpen && crud.mode !== 'view'}

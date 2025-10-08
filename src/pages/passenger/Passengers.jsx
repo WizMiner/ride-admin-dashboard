@@ -20,12 +20,12 @@ const Passengers = () => {
 
   // Calculate stats
   const totalPassengers = crud.data.length;
-  const activePassengers = crud.data.filter(
-    (p) => p.status === 'active'
-  ).length;
-  const inactivePassengers = crud.data.filter(
-    (p) => p.status === 'inactive'
-  ).length;
+  // const activePassengers = crud.data.filter(
+  //   (p) => p.status === 'active'
+  // ).length;
+  // const inactivePassengers = crud.data.filter(
+  //   (p) => p.status === 'inactive'
+  // ).length;
   const averageRating =
     crud.data.reduce((sum, p) => sum + (p.rating || 0), 0) /
     (crud.data.length || 1);
@@ -71,35 +71,35 @@ const Passengers = () => {
         </div>
       ),
     },
-    {
-      key: 'status',
-      title: 'Status',
-      render: (item) => {
-        const status = item.status || 'unknown';
-        const statusColor =
-          status === 'active'
-            ? 'bg-green-100 text-green-800'
-            : status === 'inactive'
-              ? 'bg-red-100 text-red-800'
-              : 'bg-gray-100 text-gray-800';
+    // {
+    //   key: 'status',
+    //   title: 'Status',
+    //   render: (item) => {
+    //     const status = item.status || 'unknown';
+    //     const statusColor =
+    //       status === 'active'
+    //         ? 'bg-green-100 text-green-800'
+    //         : status === 'inactive'
+    //           ? 'bg-red-100 text-red-800'
+    //           : 'bg-gray-100 text-gray-800';
 
-        return (
-          <span
-            className={cn(
-              'px-2 py-1 rounded-full text-xs font-medium',
-              statusColor
-            )}
-          >
-            {status}
-          </span>
-        );
-      },
-    },
-    {
-      key: 'wallet',
-      title: 'Wallet Balance',
-      render: (item) => `Birr ${parseFloat(item.wallet || 0).toFixed(2)}`,
-    },
+    //     return (
+    //       <span
+    //         className={cn(
+    //           'px-2 py-1 rounded-full text-xs font-medium',
+    //           statusColor
+    //         )}
+    //       >
+    //         {status}
+    //       </span>
+    //     );
+    //   },
+    // },
+    // {
+    //   key: 'wallet',
+    //   title: 'Wallet Balance',
+    //   render: (item) => `Birr ${parseFloat(item.wallet || 0).toFixed(2)}`,
+    // },
     {
       key: 'rating',
       title: 'Rating',
@@ -213,7 +213,7 @@ const Passengers = () => {
         </div>
       </div>
 
-      <div
+      {/* <div
         className={cn('rounded-lg p-4 shadow-sm', palette.card, palette.border)}
       >
         <div className="flex items-center justify-between">
@@ -239,7 +239,7 @@ const Passengers = () => {
           </div>
           <div className="w-3 h-3 bg-red-500 rounded-full" />
         </div>
-      </div>
+      </div> */}
 
       <div
         className={cn('rounded-lg p-4 shadow-sm', palette.card, palette.border)}
@@ -277,7 +277,7 @@ const Passengers = () => {
   const handleSaveWithToast = async (entity) => {
     try {
       await crud.handleSave(entity);
-      const message = `Booking rule ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`;
+      const message = `Passenger ${crud.mode === 'edit' ? 'updated' : 'created'} successfully!`;
       addToast(message, 'success');
     } catch (err) {
       const errorMessage = err?.message || 'An unexpected error occurred.';
@@ -288,7 +288,7 @@ const Passengers = () => {
   const handleDeleteWithToast = async () => {
     try {
       await crud.handleDeleteConfirm();
-      addToast('Booking rule deleted successfully!', 'success');
+      addToast('Passenger deleted successfully!', 'success');
     } catch (err) {
       const errorMessage = err?.message || 'An unexpected error occurred.';
       addToast(errorMessage, 'error');
@@ -306,7 +306,7 @@ const Passengers = () => {
         searchQuery={crud.searchQuery}
         onSearchChange={(e) => crud.handleSearch(e.target.value)}
         onAdd={crud.handleAdd}
-        onEdit={crud.handleEdit}
+        // onEdit={crud.handleEdit}
         onView={crud.handleView}
         onDelete={crud.handleDelete}
         isModalOpen={

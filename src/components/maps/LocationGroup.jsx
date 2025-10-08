@@ -53,6 +53,14 @@ const LocationGroup = ({ prefix, formData, setFormData, palette, label }) => {
     }
   };
 
+  const formControlClasses = cn(
+    'w-full p-2 border rounded',
+    palette.border,
+    palette.card,
+    palette.text,
+    palette.focusRing
+  );
+
   useEffect(() => {
     if (!isLoaded || !inputRef.current || typeof window.google === 'undefined')
       return;
@@ -105,11 +113,7 @@ const LocationGroup = ({ prefix, formData, setFormData, palette, label }) => {
           type="text"
           value={addressValue}
           onChange={handleAddressChange}
-          className={cn(
-            'w-full p-2 border rounded',
-            palette.border,
-            palette.text
-          )}
+          className={formControlClasses}
           placeholder="Start typing for autocomplete..."
         />
       </div>
@@ -123,11 +127,7 @@ const LocationGroup = ({ prefix, formData, setFormData, palette, label }) => {
             step="any"
             value={latValue}
             onChange={handleLatChange}
-            className={cn(
-              'w-full p-2 border rounded',
-              palette.border,
-              palette.text
-            )}
+            className={formControlClasses}
             required
           />
         </div>
@@ -140,11 +140,7 @@ const LocationGroup = ({ prefix, formData, setFormData, palette, label }) => {
             step="any"
             value={lngValue}
             onChange={handleLngChange}
-            className={cn(
-              'w-full p-2 border rounded',
-              palette.border,
-              palette.text
-            )}
+            className={formControlClasses}
             required
           />
         </div>
