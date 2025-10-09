@@ -130,7 +130,7 @@ const PassengerViewModal = ({ isOpen, onClose, passenger }) => {
 
           {/* Status and Additional Info */}
           <div className="grid grid-cols-2 gap-4">
-            <div className={cn('p-4 rounded-lg', palette.primaryLightBg)}>
+            {/* <div className={cn('p-4 rounded-lg', palette.primaryLightBg)}>
               <h4 className={cn('text-sm font-medium mb-2', palette.text)}>
                 Status
               </h4>
@@ -146,7 +146,7 @@ const PassengerViewModal = ({ isOpen, onClose, passenger }) => {
               >
                 {passenger.status || 'unknown'}
               </span>
-            </div>
+            </div> */}
 
             <div className={cn('p-4 rounded-lg', palette.primaryLightBg)}>
               <h4 className={cn('text-sm font-medium mb-2', palette.text)}>

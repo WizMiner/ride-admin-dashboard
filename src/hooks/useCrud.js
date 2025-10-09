@@ -172,6 +172,7 @@ const useCrud = (api, initialFilters = {}, options = {}) => {
     isAlertOpen,
     mode,
     actionLoading,
+    setActionLoading,
     handleSearch,
     handleFilter,
     handleAdd,

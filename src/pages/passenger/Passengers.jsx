@@ -150,16 +150,16 @@ const Passengers = () => {
     {
       title: 'Account Details',
       fields: [
-        {
-          key: 'status',
-          label: 'Status',
-          render: (value) => value || 'unknown',
-        },
-        {
-          key: 'wallet',
-          label: 'Wallet Balance',
-          render: (value) => `Birr ${parseFloat(value || 0).toFixed(2)}`,
-        },
+        // {
+        //   key: 'status',
+        //   label: 'Status',
+        //   render: (value) => value || 'unknown',
+        // },
+        // {
+        //   key: 'wallet',
+        //   label: 'Wallet Balance',
+        //   render: (value) => `Birr ${parseFloat(value || 0).toFixed(2)}`,
+        // },
         {
           key: 'rating',
           label: 'Rating',
@@ -257,22 +257,22 @@ const Passengers = () => {
     </>
   );
 
-  const renderFilters = () => (
-    <select
-      value={crud.filters.status}
-      onChange={(e) => crud.handleFilter('status', e.target.value)}
-      className={cn(
-        'px-4 py-2 rounded-md border',
-        palette.border,
-        palette.card,
-        palette.text
-      )}
-    >
-      <option value="all">All Status</option>
-      <option value="active">Active</option>
-      <option value="inactive">Inactive</option>
-    </select>
-  );
+  // const renderFilters = () => (
+  //   <select
+  //     value={crud.filters.status}
+  //     onChange={(e) => crud.handleFilter('status', e.target.value)}
+  //     className={cn(
+  //       'px-4 py-2 rounded-md border',
+  //       palette.border,
+  //       palette.card,
+  //       palette.text
+  //     )}
+  //   >
+  //     <option value="all">All Status</option>
+  //     <option value="active">Active</option>
+  //     <option value="inactive">Inactive</option>
+  //   </select>
+  // );
 
   const handleSaveWithToast = async (entity) => {
     try {
@@ -326,7 +326,7 @@ const Passengers = () => {
               : ''
         }
         renderStats={renderStats}
-        renderFilters={renderFilters}
+        // renderFilters={renderFilters}
         renderForm={() => (
           <PassengerForm
             initialData={crud.selectedEntity}

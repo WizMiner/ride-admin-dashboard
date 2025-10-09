@@ -28,6 +28,7 @@ import Live from '../pages/live/Live.jsx';
 import Assignments from '../pages/assignment/Assignments.jsx';
 
 import Contracts from '../pages/contract/Contracts.jsx';
+import Subscriptions from '../pages/subscriptions/SubscriptionList.jsx';
 
 export const router = createBrowserRouter([
   {
@@ -171,6 +172,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['admin', 'staff', 'superadmin']}>
             <Contracts />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'Subscriptions',
+        element: (
+          <ProtectedRoute allowedRoles={['admin', 'staff', 'superadmin']}>
+            <Subscriptions />
           </ProtectedRoute>
         ),
       },

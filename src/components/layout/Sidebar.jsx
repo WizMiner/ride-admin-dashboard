@@ -23,6 +23,8 @@ import {
   ChevronDown,
   ChevronRight,
   LogOut,
+  Signature,
+  Package,
 } from 'lucide-react';
 import { cn } from '../../common/utils';
 import { useTheme } from '../../hooks/useTheme.jsx';
@@ -160,7 +162,13 @@ const Sidebar = ({ isOpen, onClose }) => {
         {
           path: '/contracts',
           label: 'Contracts',
-          icon: Radio,
+          icon: Signature,
+          roles: ['admin', 'superadmin'],
+        },
+        {
+          path: '/subscriptions',
+          label: 'subscriptions',
+          icon: Package,
           roles: ['admin', 'superadmin'],
         },
         // {
@@ -171,49 +179,49 @@ const Sidebar = ({ isOpen, onClose }) => {
         // },
       ],
     },
-    {
-      group: 'analytics',
-      title: 'Reports & Insights',
-      items: [
-        {
-          path: '/reports',
-          label: 'Reports',
-          icon: FileText,
-          roles: ['admin', 'superadmin'],
-        },
-        {
-          path: '/insights',
-          label: 'Insights',
-          icon: BarChart3,
-          roles: ['admin', 'superadmin'],
-        },
-      ],
-    },
-    {
-      group: 'system',
-      title: 'System',
-      items: [
-        {
-          path: '/notifications',
-          label: 'Notifications',
-          icon: Bell,
-          roles: ['staff'],
-        },
-        {
-          path: '/settings',
-          label: 'Settings',
-          icon: Settings,
-          roles: ['superadmin'],
-        },
-        {
-          path: '/security',
-          label: 'Security',
-          icon: Shield,
-          roles: ['superadmin'],
-        },
-        { path: '/help', label: 'Help & Support', icon: HelpCircle },
-      ],
-    },
+    // {
+    //   group: 'analytics',
+    //   title: 'Reports & Insights',
+    //   items: [
+    //     {
+    //       path: '/reports',
+    //       label: 'Reports',
+    //       icon: FileText,
+    //       roles: ['admin', 'superadmin'],
+    //     },
+    //     {
+    //       path: '/insights',
+    //       label: 'Insights',
+    //       icon: BarChart3,
+    //       roles: ['admin', 'superadmin'],
+    //     },
+    //   ],
+    // },
+    // {
+    //   group: 'system',
+    //   title: 'System',
+    //   items: [
+    //     {
+    //       path: '/notifications',
+    //       label: 'Notifications',
+    //       icon: Bell,
+    //       roles: ['staff'],
+    //     },
+    //     {
+    //       path: '/settings',
+    //       label: 'Settings',
+    //       icon: Settings,
+    //       roles: ['superadmin'],
+    //     },
+    //     {
+    //       path: '/security',
+    //       label: 'Security',
+    //       icon: Shield,
+    //       roles: ['superadmin'],
+    //     },
+    //     { path: '/help', label: 'Help & Support', icon: HelpCircle },
+    //   ],
+    // },
   ];
 
   const isActive = (path) => {

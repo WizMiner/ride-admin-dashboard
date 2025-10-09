@@ -46,4 +46,7 @@ export const subscriptionApi = {
       `/api/admin/subscription/${id}/assign-driver`,
       data
     ),
+  status: (id, data) =>
+    contractApiInstance.put(`/api/admin/subscription/${id}`, data),
+  delete: (id) => contractApiInstance.delete(`/api/admin/subscription/${id}`),
 };
