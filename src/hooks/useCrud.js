@@ -32,8 +32,8 @@ const useCrud = (api, initialFilters = {}, options = {}) => {
   const [mode, setMode] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Helper: get correct ID field (id or _id)
-  const getEntityId = (entity) => entity?.id || entity?._id;
+  // Helper: get correct ID field (id or _id) - Stable function
+  const getEntityId = useCallback((entity) => entity?.id || entity?._id, []);
 
   const loadData = useCallback(async () => {
     setData([]);
@@ -80,42 +80,108 @@ const useCrud = (api, initialFilters = {}, options = {}) => {
     loadData();
   }, [loadData]);
 
-  // CRUD handlers
-  const handleSearch = (query) => setSearchQuery(query);
-  const handleFilter = (key, value) =>
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  // Live update helpers (stable deps)
+  const upsertEntity = useCallback(
+    (entity) => {
+      const id = getEntityId(entity);
+      if (!id) return;
+      setData((prev) => {
+        const exists = prev.some((item) => getEntityId(item) === id);
+        if (exists) {
+          const updatedData = prev.map((item) =>
+            getEntityId(item) === id ? entity : item
+          );
+          // Update selectedEntity if matching
+          if (selectedEntity && getEntityId(selectedEntity) === id) {
+            setSelectedEntity(entity);
+          }
+          return updatedData;
+        } else {
+          return [...prev, entity];
+        }
+      });
+    },
+    [selectedEntity, getEntityId]
+  );
 
-  const handleAdd = () => {
+  const addEntity = useCallback(
+    (entity) => {
+      const id = getEntityId(entity);
+      if (!id) return;
+      setData((prev) => [...prev, entity]);
+    },
+    [getEntityId]
+  );
+
+  const updateEntity = useCallback(
+    (entity) => {
+      const id = getEntityId(entity);
+      if (!id) return;
+      setData((prev) =>
+        prev.map((item) => (getEntityId(item) === id ? entity : item))
+      );
+      // Update selectedEntity if matching
+      if (selectedEntity && getEntityId(selectedEntity) === id) {
+        setSelectedEntity(entity);
+      }
+    },
+    [selectedEntity, getEntityId]
+  );
+
+  const removeEntity = useCallback(
+    (id) => {
+      if (!id) return;
+      setData((prev) => prev.filter((item) => getEntityId(item) !== id));
+      // Clear selected if matching
+      if (selectedEntity && getEntityId(selectedEntity) === id) {
+        setSelectedEntity(null);
+      }
+      // Clear delete if matching
+      if (entityToDelete && getEntityId(entityToDelete) === id) {
+        setEntityToDelete(null);
+      }
+    },
+    [selectedEntity, entityToDelete, getEntityId]
+  );
+
+  // CRUD handlers
+  const handleSearch = useCallback((query) => setSearchQuery(query), []);
+  const handleFilter = useCallback(
+    (key, value) => setFilters((prev) => ({ ...prev, [key]: value })),
+    []
+  );
+
+  const handleAdd = useCallback(() => {
     setSelectedEntity(null);
     setMode('add');
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleEdit = (entity) => {
+  const handleEdit = useCallback((entity) => {
     setSelectedEntity(entity);
     setMode('edit');
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleView = (entity) => {
+  const handleView = useCallback((entity) => {
     setSelectedEntity(entity);
     setMode('view');
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleDelete = (entity) => {
+  const handleDelete = useCallback((entity) => {
     setEntityToDelete(entity);
     setIsAlertOpen(true);
-  };
+  }, []);
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = useCallback(async () => {
     if (!entityToDelete) return;
     setActionLoading(true);
     try {
       const id = getEntityId(entityToDelete);
       if (!id) throw new Error('No valid ID found for delete');
       await api.delete(id);
-      await loadData();
+      removeEntity(id);
       setIsAlertOpen(false);
       setEntityToDelete(null);
       return Promise.resolve();
@@ -125,40 +191,47 @@ const useCrud = (api, initialFilters = {}, options = {}) => {
     } finally {
       setActionLoading(false);
     }
-  };
+  }, [entityToDelete, api, removeEntity, getEntityId]);
 
-  const handleSave = async (entity) => {
-    setActionLoading(true);
-    try {
-      if (selectedEntity) {
-        const id = getEntityId(selectedEntity);
-        if (!id) throw new Error('No valid ID found for update');
-        await api.update(id, entity);
-      } else {
-        await api.create(entity);
+  const handleSave = useCallback(
+    async (entity) => {
+      setActionLoading(true);
+      try {
+        let savedEntity;
+        if (selectedEntity) {
+          const id = getEntityId(selectedEntity);
+          if (!id) throw new Error('No valid ID found for update');
+          const response = await api.update(id, entity);
+          savedEntity = response?.data || response;
+          updateEntity(savedEntity);
+        } else {
+          const response = await api.create(entity);
+          savedEntity = response?.data || response;
+          addEntity(savedEntity);
+        }
+        setIsModalOpen(false);
+        setMode(null);
+        return Promise.resolve(savedEntity);
+      } catch (error) {
+        console.error('Save failed:', error);
+        return Promise.reject(error);
+      } finally {
+        setActionLoading(false);
       }
-      await loadData();
-      setIsModalOpen(false);
-      setMode(null);
-      return Promise.resolve();
-    } catch (error) {
-      console.error('Save failed:', error);
-      return Promise.reject(error);
-    } finally {
-      setActionLoading(false);
-    }
-  };
+    },
+    [selectedEntity, api, updateEntity, addEntity, getEntityId]
+  );
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setSelectedEntity(null);
     setMode(null);
-  };
+  }, []);
 
-  const handleCloseAlert = () => {
+  const handleCloseAlert = useCallback(() => {
     setIsAlertOpen(false);
     setEntityToDelete(null);
-  };
+  }, []);
 
   return {
     data,
@@ -184,6 +257,11 @@ const useCrud = (api, initialFilters = {}, options = {}) => {
     handleCloseModal,
     handleCloseAlert,
     loadData,
+    // Live updates
+    upsertEntity,
+    addEntity,
+    updateEntity,
+    removeEntity,
   };
 };
 

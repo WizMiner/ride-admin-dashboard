@@ -1,4 +1,4 @@
-// File: src/pages/booking/Bookings.jsx
+// src/pages/booking/Bookings.jsx
 import React, { useContext, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme.jsx';
 import { getPalette } from '../../common/themes.js';
@@ -14,6 +14,7 @@ import { AuthContext } from '../../contexts/AuthContextDefinition.jsx';
 import Modal from '../../components/ui/Modal';
 import { UserPlus } from 'lucide-react';
 import Tooltip from '../../components/ui/Tooltip';
+import { useSocketEvents } from '../../hooks/useSocketEvents'; // ← This now pulls correct useSocket internally
 
 const transformBookings = (data) => {
   if (Array.isArray(data)) return data;
@@ -52,6 +53,32 @@ const Bookings = () => {
   const [assignModal, setAssignModal] = useState({
     open: false,
     booking: null,
+  });
+
+  // Socket events for ops dashboard - listen to fleet-wide updates
+  useSocketEvents({}, (eventType, payload) => {
+    switch (eventType) {
+      case 'bookingUpdate':
+        // Refresh table on any booking update
+        crud.loadData();
+        break;
+      case 'tripStarted':
+      case 'tripOngoing':
+      case 'tripCompleted':
+        // Refresh for trip milestones
+        crud.loadData();
+        break;
+      case 'pricingUpdate':
+        // Could update local pricing cache if viewing
+        console.log('Global pricing update:', payload);
+        break;
+      case 'driverLocation':
+        // Fleet-wide location for ops map if implemented
+        console.log('Driver location update:', payload);
+        break;
+      default:
+        break;
+    }
   });
 
   // Columns (add Assign Driver action)
@@ -277,7 +304,7 @@ const Bookings = () => {
         searchQuery={crud.searchQuery}
         onSearchChange={(e) => crud.handleSearch(e.target.value)}
         onAdd={crud.handleAdd}
-        // onEdit={crud.handleEdit}
+        onEdit={crud.handleEdit}
         onView={crud.handleView}
         onDelete={crud.handleDelete}
         isModalOpen={crud.isModalOpen && crud.mode !== 'view'}
@@ -309,7 +336,7 @@ const Bookings = () => {
         booking={crud.selectedEntity}
       />
 
-      {/* Assign Driver Modal (uses stable transformBookings above) */}
+      {/* Assign Driver Modal */}
       {assignModal.open && (
         <Modal
           isOpen={assignModal.open}

@@ -1,5 +1,5 @@
 // src/pages/booking/BookingViewModal.jsx
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   User,
   Car,
@@ -8,15 +8,85 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
 import { cn } from '../../common/utils.js';
 import { useTheme } from '../../hooks/useTheme.jsx';
 import { getPalette } from '../../common/themes.js';
 import Modal from '../../components/ui/Modal';
+import LocationMap from '../../components/maps/LocationMap';
+import { useGoogleMaps } from '../../hooks/useGoogleMaps';
+import { useSocket } from '../../hooks/useSocket'; // ← Fixed: Import from hooks, not context
+import { useSocketEvents } from '../../hooks/useSocketEvents';
+import Spinner from '../../components/ui/Spinner';
 
 const BookingViewModal = ({ isOpen, onClose, booking }) => {
   const { currentTheme } = useTheme();
   const palette = getPalette(currentTheme);
+  const { isLoaded: mapsLoaded } = useGoogleMaps();
+  const { socket, joinRoom, leaveRoom, isJoiningRoom, isConnected } =
+    useSocket();
+  const [liveLocation, setLiveLocation] = useState(null);
+  const [eta, setEta] = useState(null);
+  const [currentPricing, setCurrentPricing] = useState(
+    booking?.fareEstimated || 0
+  );
+  const [isRequestingStatus, setIsRequestingStatus] = useState(false);
+  const roomJoinedRef = useRef(false);
+
+  // Emit status request on open for fresh snapshot
+  useEffect(() => {
+    if (isOpen && booking?.id && socket) {
+      setIsRequestingStatus(true);
+      socket.emit('booking:status_request', { bookingId: booking.id });
+    }
+
+    return () => {
+      setIsRequestingStatus(false);
+    };
+  }, [isOpen, booking?.id, socket]);
+
+  // Join booking room for live updates
+  useEffect(() => {
+    if (isOpen && booking?.id && !roomJoinedRef.current && isConnected) {
+      joinRoom(`booking:${booking.id}`).then((success) => {
+        if (success) {
+          roomJoinedRef.current = true;
+        }
+      });
+    }
+
+    return () => {
+      if (roomJoinedRef.current && booking?.id) {
+        leaveRoom(`booking:${booking.id}`);
+        roomJoinedRef.current = false;
+      }
+    };
+  }, [isOpen, booking?.id, joinRoom, leaveRoom, isConnected]);
+
+  // Listen to live events for this booking
+  useSocketEvents({}, (eventType, payload) => {
+    if (payload.bookingId !== booking.id) return;
+    switch (eventType) {
+      case 'bookingUpdate':
+        // Status snapshot received; booking prop will update via parent crud
+        console.log('Status snapshot:', payload);
+        setIsRequestingStatus(false);
+        break;
+      case 'driverLocation':
+        setLiveLocation(payload);
+        break;
+      case 'etaUpdate':
+        setEta(payload.etaMinutes);
+        break;
+      case 'pricingUpdate':
+        setCurrentPricing(payload.fareEstimated || payload.total);
+        break;
+      default:
+        break;
+    }
+  });
 
   if (!isOpen || !booking) return null;
 
@@ -35,6 +105,13 @@ const BookingViewModal = ({ isOpen, onClose, booking }) => {
     }
   };
 
+  const driverPos = liveLocation
+    ? {
+        lat: liveLocation.latitude,
+        lng: liveLocation.longitude,
+      }
+    : null;
+
   return (
     <Modal
       isOpen={isOpen}
@@ -46,15 +123,6 @@ const BookingViewModal = ({ isOpen, onClose, booking }) => {
         {/* Booking ID and Status */}
         <div className="flex items-center justify-between">
           <div>
-            {/* <h3 className={cn('text-lg font-semibold', palette.text)}>
-              Booking ID: {booking.id}
-            </h3>
-            <p className={cn('text-sm', palette.mutedText)}>
-              Created: {new Date(booking.createdAt).toLocaleString()}
-            </p>
-            <p className={cn('text-sm', palette.mutedText)}>
-              Last Updated: {new Date(booking.updatedAt).toLocaleString()}
-            </p> */}
             <p className={cn('text-lg font-semibold', palette.mutedText)}>
               Status
             </p>
@@ -67,7 +135,66 @@ const BookingViewModal = ({ isOpen, onClose, booking }) => {
           </div>
         </div>
 
-        {/* Passenger and Driver */}
+        {/* Live Map for Tracking */}
+        <div className={cn('p-4 rounded-lg', palette.primaryLightBg)}>
+          <div className="flex items-center justify-between mb-3">
+            <h4 className={cn('font-medium', palette.text)}>Live Tracking</h4>
+            <div
+              className={cn(
+                'flex items-center gap-1 px-2 py-1 rounded text-xs',
+                isConnected
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-red-100 text-red-800'
+              )}
+            >
+              {isConnected ? <Wifi size={12} /> : <WifiOff size={12} />}
+              {isConnected ? 'Live' : 'Offline'}
+            </div>
+          </div>
+          {mapsLoaded ? (
+            <LocationMap
+              pickup={{
+                lat: parseFloat(booking.pickup?.latitude),
+                lng: parseFloat(booking.pickup?.longitude),
+              }}
+              dropoff={{
+                lat: parseFloat(booking.dropoff?.latitude),
+                lng: parseFloat(booking.dropoff?.longitude),
+              }}
+              currentDriver={driverPos}
+              palette={palette}
+            />
+          ) : (
+            <div
+              className={cn(
+                'h-64 flex items-center justify-center',
+                palette.card
+              )}
+            >
+              <Spinner size="small" />
+              <span className={cn('ml-2', palette.mutedText)}>
+                Loading map...
+              </span>
+            </div>
+          )}
+          {isJoiningRoom && (
+            <p className={cn('text-sm', palette.mutedText)}>
+              Joining live updates...
+            </p>
+          )}
+          {isRequestingStatus && (
+            <p className={cn('text-sm', palette.mutedText)}>
+              Fetching live status...
+            </p>
+          )}
+          {eta && (
+            <p className={cn('text-sm font-medium', palette.text)}>
+              ETA: {eta} minutes
+            </p>
+          )}
+        </div>
+
+        {/* Participants */}
         <div className={cn('p-4 rounded-lg', palette.primaryLightBg)}>
           <h4 className={cn('font-medium mb-3', palette.text)}>Participants</h4>
           <div className="space-y-2">
@@ -128,13 +255,12 @@ const BookingViewModal = ({ isOpen, onClose, booking }) => {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className={cn('text-sm', palette.mutedText)}>
-                Estimated Fare:
+                Current Fare:
               </span>
               <span className={cn('text-sm font-medium', palette.text)}>
-                {booking.fareEstimated?.toFixed(2) || 'N/A'} Birr
+                {currentPricing?.toFixed(2) || 'N/A'} Birr
               </span>
             </div>
-            {/* New: Fare Breakdown Details */}
             <div className="flex justify-between">
               <span className={cn('text-sm', palette.mutedText)}>Base:</span>
               <span className={cn('text-sm font-medium', palette.text)}>

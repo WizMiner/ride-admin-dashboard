@@ -1,4 +1,6 @@
 // src/components/maps/LocationMap.jsx
+/* global google */
+
 import React, { useEffect, useRef } from 'react';
 import { cn } from '../../common/utils';
 import { defaultMapCenter } from '../../config/googleMaps';
@@ -7,6 +9,7 @@ import { useGoogleMaps } from '../../hooks/useGoogleMaps';
 const LocationMap = ({
   pickup,
   dropoff,
+  currentDriver, // Live driver position
   onPickupChange,
   onDropoffChange,
   palette,
@@ -17,6 +20,7 @@ const LocationMap = ({
   const mapInstanceRef = useRef(null);
   const pickupMarkerRef = useRef(null);
   const dropoffMarkerRef = useRef(null);
+  const driverMarkerRef = useRef(null);
   const directionsRendererRef = useRef(null);
   const geocoderRef = useRef(null);
   const clickListenerRef = useRef(null);
@@ -27,27 +31,26 @@ const LocationMap = ({
 
     const { google } = window;
 
-    // Cleanup previous instances
+    // Cleanup
     if (mapInstanceRef.current) {
       google.maps.event.clearInstanceListeners(mapInstanceRef.current);
       mapInstanceRef.current = null;
     }
     if (pickupMarkerRef.current) {
-      google.maps.event.clearInstanceListeners(pickupMarkerRef.current);
       pickupMarkerRef.current.setMap(null);
       pickupMarkerRef.current = null;
     }
     if (dropoffMarkerRef.current) {
-      google.maps.event.clearInstanceListeners(dropoffMarkerRef.current);
       dropoffMarkerRef.current.setMap(null);
       dropoffMarkerRef.current = null;
+    }
+    if (driverMarkerRef.current) {
+      driverMarkerRef.current.setMap(null);
+      driverMarkerRef.current = null;
     }
     if (directionsRendererRef.current) {
       directionsRendererRef.current.setMap(null);
       directionsRendererRef.current = null;
-    }
-    if (geocoderRef.current) {
-      geocoderRef.current = null;
     }
     if (clickListenerRef.current) {
       google.maps.event.removeListener(clickListenerRef.current);
@@ -65,6 +68,7 @@ const LocationMap = ({
 
     const safePickup = pickup || { lat: null, lng: null };
     const safeDropoff = dropoff || { lat: null, lng: null };
+    const safeDriver = currentDriver || { lat: null, lng: null };
 
     let hasPickup =
       safePickup.lat &&
@@ -76,39 +80,38 @@ const LocationMap = ({
       safeDropoff.lng &&
       !isNaN(safeDropoff.lat) &&
       !isNaN(safeDropoff.lng);
+    let hasDriver =
+      safeDriver.lat &&
+      safeDriver.lng &&
+      !isNaN(safeDriver.lat) &&
+      !isNaN(safeDriver.lng);
 
-    // Click listener to set location if not set
+    // Click to set locations
     const handleMapClick = (e) => {
       const lat = e.latLng.lat();
       const lng = e.latLng.lng();
 
       if (!hasPickup) {
-        // Set as pickup
         geocoderRef.current.geocode(
           { location: { lat, lng } },
           (results, status) => {
             let address = '';
-            if (status === 'OK' && results[0]) {
+            if (status === 'OK' && results[0])
               address = results[0].formatted_address;
-            }
-            if (onPickupChange) {
+            if (onPickupChange)
               onPickupChange({ latitude: lat, longitude: lng }, address);
-            }
           }
         );
         hasPickup = true;
       } else if (!hasDropoff) {
-        // Set as dropoff
         geocoderRef.current.geocode(
           { location: { lat, lng } },
           (results, status) => {
             let address = '';
-            if (status === 'OK' && results[0]) {
+            if (status === 'OK' && results[0])
               address = results[0].formatted_address;
-            }
-            if (onDropoffChange) {
+            if (onDropoffChange)
               onDropoffChange({ latitude: lat, longitude: lng }, address);
-            }
           }
         );
         hasDropoff = true;
@@ -123,29 +126,9 @@ const LocationMap = ({
       pickupMarkerRef.current = new google.maps.Marker({
         position: pos,
         map,
-        title: 'Pickup Location',
-        draggable: true,
-        icon: {
-          url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-        },
+        title: 'Pickup',
+        icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
       });
-
-      pickupMarkerRef.current.addListener('dragend', (e) => {
-        const newPos = e.latLng;
-        geocoderRef.current.geocode({ location: newPos }, (results, status) => {
-          let address = '';
-          if (status === 'OK' && results[0]) {
-            address = results[0].formatted_address;
-          }
-          if (onPickupChange) {
-            onPickupChange(
-              { latitude: newPos.lat(), longitude: newPos.lng() },
-              address
-            );
-          }
-        });
-      });
-
       map.setCenter(pos);
     }
 
@@ -155,36 +138,29 @@ const LocationMap = ({
       dropoffMarkerRef.current = new google.maps.Marker({
         position: pos,
         map,
-        title: 'Dropoff Location',
-        draggable: true,
-        icon: {
-          url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-        },
-      });
-
-      dropoffMarkerRef.current.addListener('dragend', (e) => {
-        const newPos = e.latLng;
-        geocoderRef.current.geocode({ location: newPos }, (results, status) => {
-          let address = '';
-          if (status === 'OK' && results[0]) {
-            address = results[0].formatted_address;
-          }
-          if (onDropoffChange) {
-            onDropoffChange(
-              { latitude: newPos.lat(), longitude: newPos.lng() },
-              address
-            );
-          }
-        });
+        title: 'Dropoff',
+        icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
       });
     }
 
-    // Directions if both locations available
+    // Live driver marker
+    if (hasDriver) {
+      const pos = { lat: safeDriver.lat, lng: safeDriver.lng };
+      driverMarkerRef.current = new google.maps.Marker({
+        position: pos,
+        map,
+        title: 'Driver Live Location',
+        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+      });
+      map.setCenter(pos); // Center on driver for live view
+    }
+
+    // Directions
     if (hasPickup && hasDropoff) {
       const directionsService = new google.maps.DirectionsService();
       directionsRendererRef.current = new google.maps.DirectionsRenderer({
         map,
-        suppressMarkers: true, // Since we have custom markers
+        suppressMarkers: true,
       });
 
       directionsService.route(
@@ -197,39 +173,32 @@ const LocationMap = ({
           if (status === 'OK') {
             directionsRendererRef.current.setDirections(result);
           } else {
-            console.warn('Directions request failed due to ' + status);
+            console.warn('Directions failed:', status);
           }
         }
       );
     }
 
-    // Cleanup function
     return () => {
-      if (mapInstanceRef.current) {
+      // Cleanup
+      if (mapInstanceRef.current)
         google.maps.event.clearInstanceListeners(mapInstanceRef.current);
-        mapInstanceRef.current = null;
-      }
-      if (pickupMarkerRef.current) {
-        google.maps.event.clearInstanceListeners(pickupMarkerRef.current);
-        pickupMarkerRef.current.setMap(null);
-        pickupMarkerRef.current = null;
-      }
-      if (dropoffMarkerRef.current) {
-        google.maps.event.clearInstanceListeners(dropoffMarkerRef.current);
-        dropoffMarkerRef.current.setMap(null);
-        dropoffMarkerRef.current = null;
-      }
-      if (directionsRendererRef.current) {
+      if (pickupMarkerRef.current) pickupMarkerRef.current.setMap(null);
+      if (dropoffMarkerRef.current) dropoffMarkerRef.current.setMap(null);
+      if (driverMarkerRef.current) driverMarkerRef.current.setMap(null);
+      if (directionsRendererRef.current)
         directionsRendererRef.current.setMap(null);
-        directionsRendererRef.current = null;
-      }
-      if (clickListenerRef.current) {
+      if (clickListenerRef.current)
         google.maps.event.removeListener(clickListenerRef.current);
-        clickListenerRef.current = null;
-      }
-      geocoderRef.current = null;
     };
-  }, [isLoaded, pickup, dropoff, onPickupChange, onDropoffChange]);
+  }, [
+    isLoaded,
+    pickup,
+    dropoff,
+    currentDriver,
+    onPickupChange,
+    onDropoffChange,
+  ]);
 
   return (
     <div
