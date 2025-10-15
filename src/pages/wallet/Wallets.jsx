@@ -18,12 +18,16 @@ const Wallets = () => {
   // Disable create/edit/delete for wallets
   const crud = useCrud(WalletApi, {}, { transformData: transformWallets });
 
-  // Table columns
   const columns = [
+    // {
+    //   key: 'id',
+    //   title: 'User ID',
+    //   render: (w) => <p className={cn(palette.text)}>{w.id}</p>,
+    // },
     {
-      key: 'userId',
-      title: 'User ID',
-      render: (w) => <p className={cn(palette.text)}>{w.userId}</p>,
+      key: 'name',
+      title: 'Name',
+      render: (w) => <p className={cn(palette.text)}>{w.name}</p>,
     },
     {
       key: 'role',
@@ -31,12 +35,33 @@ const Wallets = () => {
       render: (w) => <p className={cn(palette.text)}>{w.role}</p>,
     },
     {
-      key: 'balance',
-      title: 'Balance',
-      render: (w) => (
-        <p className={cn(palette.text)}>{Number(w.balance).toFixed(2)}</p>
-      ),
+      key: 'phone',
+      title: 'Phone',
+      render: (w) => <p className={cn(palette.text)}>{w.phone}</p>,
     },
+    {
+      key: 'email',
+      title: 'Email',
+      render: (w) => <p className={cn(palette.text)}>{w.email}</p>,
+    },
+    // {
+    //   key: 'balance',
+    //   title: 'Balance',
+    //   render: (w) => (
+    //     <p className={cn(palette.text)}>
+    //       {Number(w.balance).toFixed(2)} {w.currency}
+    //     </p>
+    //   ),
+    // },
+    // {
+    //   key: 'totalEarnings',
+    //   title: 'Total Earnings',
+    //   render: (w) => (
+    //     <p className={cn(palette.text)}>
+    //       {Number(w.totalEarnings).toFixed(2)} {w.currency}
+    //     </p>
+    //   ),
+    // },
   ];
 
   return (

@@ -95,15 +95,15 @@ const Analytics = () => {
         },
       ];
 
-  const financeData = isLoadingDashboard
-    ? [{ name: 'Loading...', value: 1 }]
-    : data.finance
-      ? [
-          { name: 'Revenue', value: data.finance.totalRevenue || 0 },
-          { name: 'Commission', value: data.finance.commissionEarned || 0 },
-          { name: 'Pending Payouts', value: data.finance.pendingPayouts || 0 },
-        ]
-      : [];
+  // const financeData = isLoadingDashboard
+  //   ? [{ name: 'Loading...', value: 1 }]
+  //   : data.finance
+  //     ? [
+  //         { name: 'Revenue', value: data.finance.totalRevenue || 0 },
+  //         { name: 'Commission', value: data.finance.commissionEarned || 0 },
+  //         { name: 'Pending Payouts', value: data.finance.pendingPayouts || 0 },
+  //       ]
+  //     : [];
 
   const handleExport = () => {
     console.log('Exporting data...');
@@ -143,7 +143,7 @@ const Analytics = () => {
       </div>
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
         {/* Performance Chart */}
         <div
           className={cn(
@@ -167,7 +167,7 @@ const Analytics = () => {
         </div>
 
         {/* Finance Distribution */}
-        <div
+        {/* <div
           className={cn(
             'rounded-xl p-6 shadow-md',
             palette.card,
@@ -186,7 +186,7 @@ const Analytics = () => {
             palette={palette}
             currencySymbol="Birr"
           />
-        </div>
+        </div> */}
       </div>
 
       {/* Detailed Reports */}

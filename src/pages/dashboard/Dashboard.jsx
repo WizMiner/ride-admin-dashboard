@@ -149,17 +149,17 @@ const Dashboard = () => {
         },
       ];
 
-  const systemStatusItems = isLoadingData
-    ? [
-        { name: 'API Status', status: 'Loading...', color: 'gray' },
-        { name: 'Database', status: 'Loading...', color: 'gray' },
-        { name: 'Payment Gateway', status: 'Loading...', color: 'gray' },
-      ]
-    : [
-        { name: 'API Status', status: 'Online', color: 'green' },
-        { name: 'Database', status: 'Healthy', color: 'green' },
-        { name: 'Payment Gateway', status: 'Active', color: 'green' },
-      ];
+  // const systemStatusItems = isLoadingData
+  //   ? [
+  //       { name: 'API Status', status: 'Loading...', color: 'gray' },
+  //       { name: 'Database', status: 'Loading...', color: 'gray' },
+  //       { name: 'Payment Gateway', status: 'Loading...', color: 'gray' },
+  //     ]
+  //   : [
+  //       { name: 'API Status', status: 'Online', color: 'green' },
+  //       { name: 'Database', status: 'Healthy', color: 'green' },
+  //       { name: 'Payment Gateway', status: 'Active', color: 'green' },
+  //     ];
 
   const quickStatsData = {
     pendingPayouts: isLoadingData
@@ -289,7 +289,7 @@ const Dashboard = () => {
 
         <div className="space-y-6">
           {/* System Status */}
-          <div
+          {/* <div
             className={cn(
               'rounded-xl p-6 shadow-md',
               palette.card,
@@ -341,7 +341,7 @@ const Dashboard = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Quick Stats */}
           <div

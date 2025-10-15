@@ -53,7 +53,18 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
                 palette.avatarBg
               )}
             >
-              <Car size={28} className="text-white" />
+              {/* <Car size={28} className="text-white" /> */}
+              <div
+                className={cn('rounded-full ', palette.avatarBg)}
+                style={{ width: 34, height: 34 }}
+              >
+                <img
+                  src="/logo.webp"
+                  alt="Logo"
+                  className="w-full h-full object-contain"
+                  style={{ filter: palette.iconFilter }}
+                />
+              </div>
             </div>
             <span
               className={cn(
@@ -61,7 +72,7 @@ const Navbar = ({ onMenuToggle, isSidebarOpen }) => {
                 'text-theme'
               )}
             >
-              Ride Admin
+              Daily Transport
             </span>
           </div>
         </div>

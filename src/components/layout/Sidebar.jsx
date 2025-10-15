@@ -54,6 +54,8 @@ const Sidebar = ({ isOpen, onClose }) => {
     if (!roles.length) return true;
     return roles.some((role) => auth.roles.includes(role));
   };
+  // console.log('Current user roles:', auth.roles);
+  // console.log('User:', auth.user);
 
   const menuItems = [
     {

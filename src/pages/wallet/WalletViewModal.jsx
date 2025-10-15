@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '../../common/utils';
 import { useTheme } from '../../hooks/useTheme.jsx';
 import { getPalette } from '../../common/themes';
-import { User, Calendar, RefreshCw, Wallet } from 'lucide-react';
+import { User, Phone, Mail, DollarSign, Wallet } from 'lucide-react';
 import Modal from '../../components/ui/Modal';
 
 const WalletViewModal = ({ isOpen, onClose, wallet }) => {
@@ -11,22 +11,30 @@ const WalletViewModal = ({ isOpen, onClose, wallet }) => {
 
   if (!isOpen || !wallet) return null;
 
-  //   const formatDate = (dateString) =>
-  //     dateString ? new Date(dateString).toLocaleString() : 'N/A';
+  const {
+    // id,
+    name,
+    phone,
+    email,
+    role,
+    balance,
+    totalEarnings,
+    currency,
+  } = wallet;
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Wallet Details"
+      title={`Wallet Details: ${name || 'N/A'}`}
       palette={palette}
     >
       <div className="space-y-6">
-        {/* Wallet Info Card (Updated to use theme palette and grid) */}
+        {/* === User/Wallet Summary Card === */}
         <div
           className={cn(
             'flex items-start gap-4 p-4 rounded-lg shadow-sm',
-            palette.primaryLightBg, // Use primary light background for emphasis
+            palette.primaryLightBg,
             palette.border
           )}
         >
@@ -35,13 +43,28 @@ const WalletViewModal = ({ isOpen, onClose, wallet }) => {
               'w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 bg-primary-100 dark:bg-primary-900/20'
             )}
           >
-            {/* Wallet icon using theme's icon text color */}
+            {/* User icon */}
             <User size={24} className={cn(palette.iconText)} />
           </div>
 
           <div className="flex-grow grid grid-cols-2 gap-y-3 gap-x-4">
+            {/* Name */}
+            <div className="col-span-2">
+              <h4
+                className={cn(
+                  'text-xs font-semibold uppercase',
+                  palette.mutedText
+                )}
+              >
+                Account Holder
+              </h4>
+              <p className={cn('text-lg font-bold', palette.text)}>
+                {name || 'N/A'}
+              </p>
+            </div>
+
             {/* User ID */}
-            <div>
+            {/* <div>
               <h4
                 className={cn(
                   'text-xs font-semibold uppercase',
@@ -50,10 +73,13 @@ const WalletViewModal = ({ isOpen, onClose, wallet }) => {
               >
                 User ID
               </h4>
-              <p className={cn('text-sm font-medium', palette.text)}>
-                {wallet.userId}
-              </p>
-            </div>
+              <div className="flex items-center gap-1">
+                <Hash size={14} className={cn(palette.mutedText)} />
+                <p className={cn('text-sm font-medium', palette.text)}>
+                  {id || 'N/A'}
+                </p>
+              </div>
+            </div> */}
 
             {/* Role */}
             <div>
@@ -66,73 +92,79 @@ const WalletViewModal = ({ isOpen, onClose, wallet }) => {
                 Role
               </h4>
               <p className={cn('text-sm font-medium', palette.text)}>
-                {wallet.role}
+                {role || 'N/A'}
               </p>
-            </div>
-
-            {/* Balance */}
-            <div className="col-span-2">
-              <h4
-                className={cn(
-                  'text-xs font-semibold uppercase',
-                  palette.mutedText
-                )}
-              >
-                Current Balance
-              </h4>
-              <div className="flex items-center gap-1">
-                <Wallet size={16} className={cn(palette.iconText)} />
-                <p className={cn('text-lg font-bold', palette.text)}>
-                  {Number(wallet.balance).toFixed(2)}
-                </p>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Metadata Card */}
-        {/* <div className={cn('p-4 rounded-lg', palette.primaryLightBg)}>
-          <h4
-            className={cn(
-              'font-semibold mb-3 border-b pb-2',
-              palette.text,
-              palette.border
-            )}
-          >
-            Metadata
+        {/* === Contact and Financial Details === */}
+        <div className={cn('space-y-4 p-4 rounded-lg border', palette.border)}>
+          <h4 className={cn('font-semibold text-base', palette.text)}>
+            Financial & Contact Information
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Balance */}
             <div className="flex items-start gap-2">
-              <Calendar
+              <Wallet
                 size={16}
-                className={cn(palette.mutedText, 'mt-1 flex-shrink-0')}
+                className={cn(palette.iconText, 'mt-1 flex-shrink-0')}
               />
               <div>
                 <p className={cn('text-xs font-medium', palette.mutedText)}>
-                  Created At
+                  Current Balance
                 </p>
-                <p className={cn('text-sm', palette.text)}>
-                  {formatDate(wallet.createdAt)}
+                <p className={cn('text-sm font-semibold', palette.text)}>
+                  {Number(balance).toFixed(2)} {currency || 'ETB'}
                 </p>
               </div>
             </div>
 
+            {/* Total Earnings (Assuming this is a key financial metric) */}
             <div className="flex items-start gap-2">
-              <RefreshCw
+              <DollarSign
+                size={16}
+                className={cn('text-green-500', 'mt-1 flex-shrink-0')}
+              />
+              <div>
+                <p className={cn('text-xs font-medium', palette.mutedText)}>
+                  Total Earnings
+                </p>
+                <p className={cn('text-sm font-semibold', palette.text)}>
+                  {Number(totalEarnings).toFixed(2)} {currency || 'ETB'}
+                </p>
+              </div>
+            </div>
+
+            {/* Phone */}
+            <div className="flex items-start gap-2">
+              <Phone
                 size={16}
                 className={cn(palette.mutedText, 'mt-1 flex-shrink-0')}
               />
               <div>
                 <p className={cn('text-xs font-medium', palette.mutedText)}>
-                  Updated At
+                  Phone
                 </p>
-                <p className={cn('text-sm', palette.text)}>
-                  {formatDate(wallet.updatedAt)}
+                <p className={cn('text-sm', palette.text)}>{phone || 'N/A'}</p>
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className="flex items-start gap-2">
+              <Mail
+                size={16}
+                className={cn(palette.mutedText, 'mt-1 flex-shrink-0')}
+              />
+              <div>
+                <p className={cn('text-xs font-medium', palette.mutedText)}>
+                  Email
                 </p>
+                <p className={cn('text-sm', palette.text)}>{email || 'N/A'}</p>
               </div>
             </div>
           </div>
-        </div> */}
+        </div>
       </div>
 
       {/* Close Button */}
